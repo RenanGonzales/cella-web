@@ -1,0 +1,95 @@
+{
+  "app": {
+    "tagline": "Sua despensa, na ordem do seu mercado."
+  },
+  "intro": {
+    "takeTour": "Fazer o tour",
+    "tourLength": "1 min",
+    "explore": "Explorar sozinho",
+    "skip": "Toque em qualquer lugar para pular"
+  },
+  "login": {
+    "title": "Bem-vindo de volta",
+    "subtitle": "Entre na sua casa.",
+    "email": "E-mail",
+    "password": "Senha",
+    "submit": "Entrar",
+    "or": "ou",
+    "demo": "Testar a demo",
+    "demoHint": "Sem cadastro. Uma casa de exemplo com 35 produtos.",
+    "failed": "E-mail ou senha inválidos.",
+    "demoFailed": "A demo não está disponível agora."
+  },
+  "nav": {
+    "home": "Início",
+    "list": "Lista de compras",
+    "products": "Produtos",
+    "markets": "Mercados",
+    "history": "Histórico",
+    "collapse": "Recolher menu",
+    "expand": "Expandir menu",
+    "logout": "Sair",
+    "search": "Buscar produtos",
+    "household": "Casa",
+    "stocked": "Abastecido",
+    "invite": "Código de convite",
+    "you": "Você"
+  },
+  "home": {
+    "title": "Início",
+    "greeting": "Olá, {{name}}",
+    "summary": "{{areas}} áreas · {{products}} produtos",
+    "shoppingList": "Lista de compras",
+    "items_one": "item",
+    "items_other": "itens",
+    "listEmpty": "Nada para comprar. Boa.",
+    "empty": "Acabou",
+    "atMinimum": "No mínimo",
+    "estimated": "Estimado",
+    "listDetail": "{{empty}} acabaram · {{atMinimum}} no mínimo",
+    "runningLow": "Acabando",
+    "allGood": "Tudo certo",
+    "low": "{{count}} acabando",
+    "areaDetail": "{{count}} produtos · {{percent}}% abastecido",
+    "use": "Usar"
+  },
+  "area": {
+    "back": "Voltar",
+    "products": "{{count}} produtos",
+    "empty": "Nenhum produto aqui ainda.",
+    "use": "Usar {{amount}}",
+    "useAria": "Usar {{amount}} de {{name}}",
+    "ofIdeal": "de {{ideal}}",
+    "onList": "Na lista",
+    "min": "mín. {{value}}"
+  },
+  "consume": {
+    "done": "{{name}} usado · restam {{left}}",
+    "nothingLeft": "{{name}} já está zerado",
+    "undo": "Desfazer",
+    "undone": "Desfeito",
+    "failed": "Não foi possível salvar. Tente de novo."
+  },
+  "soon": {
+    "title": "Em breve",
+    "text": "Esta tela chega na próxima versão."
+  },
+  "areas": {
+    "Fridge": "Geladeira",
+    "Freezer": "Freezer",
+    "Pantry": "Despensa",
+    "Bathroom": "Banheiro",
+    "Laundry": "Lavanderia"
+  },
+  "units": {
+    "un": "",
+    "kg": "kg",
+    "g": "g",
+    "l": "L",
+    "ml": "ml"
+  },
+  "errors": {
+    "generic": "Algo deu errado. Tente de novo.",
+    "offline": "Não foi possível falar com o servidor."
+  }
+}

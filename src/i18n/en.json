@@ -1,0 +1,95 @@
+{
+  "app": {
+    "tagline": "Your pantry, sorted by your market."
+  },
+  "intro": {
+    "takeTour": "Take the tour",
+    "tourLength": "1 min",
+    "explore": "Explore on my own",
+    "skip": "Tap anywhere to skip"
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Log in to your household.",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log in",
+    "or": "or",
+    "demo": "Try the demo",
+    "demoHint": "No sign-up. A sample household with 35 products.",
+    "failed": "Invalid email or password.",
+    "demoFailed": "The demo is not available right now."
+  },
+  "nav": {
+    "home": "Home",
+    "list": "Shopping list",
+    "products": "Products",
+    "markets": "Markets",
+    "history": "History",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
+    "logout": "Log out",
+    "search": "Search products",
+    "household": "Household",
+    "stocked": "Stocked",
+    "invite": "Invite code",
+    "you": "You"
+  },
+  "home": {
+    "title": "Home",
+    "greeting": "Hello, {{name}}",
+    "summary": "{{areas}} areas · {{products}} products",
+    "shoppingList": "Shopping list",
+    "items_one": "item",
+    "items_other": "items",
+    "listEmpty": "Nothing to buy. Nice.",
+    "empty": "Empty",
+    "atMinimum": "At minimum",
+    "estimated": "Estimated",
+    "listDetail": "{{empty}} empty · {{atMinimum}} at their minimum",
+    "runningLow": "Running low",
+    "allGood": "All good",
+    "low": "{{count}} low",
+    "areaDetail": "{{count}} products · {{percent}}% stocked",
+    "use": "Use"
+  },
+  "area": {
+    "back": "Back",
+    "products": "{{count}} products",
+    "empty": "No products here yet.",
+    "use": "Use {{amount}}",
+    "useAria": "Use {{amount}} of {{name}}",
+    "ofIdeal": "of {{ideal}}",
+    "onList": "On the list",
+    "min": "min {{value}}"
+  },
+  "consume": {
+    "done": "{{name}} used · {{left}} left",
+    "nothingLeft": "{{name}} is already at zero",
+    "undo": "Undo",
+    "undone": "Undone",
+    "failed": "Could not save. Try again."
+  },
+  "soon": {
+    "title": "Coming soon",
+    "text": "This screen arrives in the next version."
+  },
+  "areas": {
+    "Fridge": "Fridge",
+    "Freezer": "Freezer",
+    "Pantry": "Pantry",
+    "Bathroom": "Bathroom",
+    "Laundry": "Laundry"
+  },
+  "units": {
+    "un": "",
+    "kg": "kg",
+    "g": "g",
+    "l": "L",
+    "ml": "ml"
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again.",
+    "offline": "Cannot reach the server."
+  }
+}
