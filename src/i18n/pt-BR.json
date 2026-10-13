@@ -70,6 +70,75 @@
     "undone": "Desfeito",
     "failed": "Não foi possível salvar. Tente de novo."
   },
+  "list": {
+    "title": "Lista de compras",
+    "sortedBy": "Na ordem de",
+    "sortedByCategory": "Por categoria",
+    "other": "Outros",
+    "add": "Adicionar item",
+    "addTitle": "Adicionar à lista",
+    "addConfirm": "Adicionar",
+    "product": "Produto",
+    "noProducts": "Todos os produtos já estão na lista",
+    "close": "Fechar",
+    "toBuy": "Comprar",
+    "bought": "No carrinho",
+    "less": "Menos",
+    "more": "Mais",
+    "remove": "Remover",
+    "save": "Salvar",
+    "editAria": "Editar {{name}}",
+    "optionsAria": "Opções de {{name}}",
+    "ownerAria": "Rota de {{name}}",
+    "noMarket": "Cadastre um mercado para ordenar a lista pelos corredores e começar as compras.",
+    "startShopping": "Começar as compras",
+    "menu": "Mais opções",
+    "split": "Dividir a rota",
+    "cancelShopping": "Sair sem comprar",
+    "inCart": "No carrinho",
+    "yourRoute": "sua rota",
+    "wholeList": "lista toda",
+    "left_one": "falta {{count}}",
+    "left_other": "faltam {{count}}",
+    "progress": "{{checked}} de {{total}} itens no carrinho",
+    "whose": "Itens de quem",
+    "myRoute": "Minha rota · {{count}}",
+    "everyone": "Todos · {{count}}",
+    "routeEmpty": "Nada na sua rota. Veja a lista toda.",
+    "notFoundMeta": "Não encontrado · vai para a próxima lista",
+    "markNotFound": "Não encontrei",
+    "foundIt": "Encontrei",
+    "putInCart": "No carrinho",
+    "whoPicks": "Quem pega",
+    "anyone": "Qualquer um",
+    "splitTitle": "Dividir a rota",
+    "splitHint": "Cada pessoa fica com um bloco de corredores vizinhos, equilibrado pelo número de itens. Você pega os primeiros.",
+    "splitConfirm": "Dividir",
+    "leaveTitle": "Sair sem comprar?",
+    "leaveText": "Todos os itens continuam na lista. O que foi marcado volta a ficar desmarcado.",
+    "leaveConfirm": "Sair",
+    "keepShopping": "Continuar comprando",
+    "finish": "Finalizar compras",
+    "checkoutTitle": "Finalizar compras?",
+    "notFound": "Não encontrados",
+    "toPick": "Não pegos",
+    "estimatedCart": "Estimativa do carrinho:",
+    "movesNext_one": "{{count}} item vai para a próxima lista.",
+    "movesNext_other": "{{count}} itens vão para a próxima lista.",
+    "cartEmpty": "O carrinho está vazio: nada será somado ao estoque.",
+    "finishConfirm": "Finalizar",
+    "doneTitle": "Compra registrada",
+    "stockUp_one": "{{count}} item somado ao estoque",
+    "stockUp_other": "{{count}} itens somados ao estoque",
+    "carried_one": "{{count}} item foi para a próxima lista",
+    "carried_other": "{{count}} itens foram para a próxima lista",
+    "backHome": "Voltar ao início",
+    "changedElsewhere": "A lista mudou em outro celular. Já está atualizada.",
+    "finishedElsewhere": "As compras foram finalizadas em outro celular.",
+    "estimatedFromLast": "Estimado pelos últimos preços. Coloque os reais depois no Histórico.",
+    "switchToPartner": "Ver o celular do Sam",
+    "switchToMain": "Voltar ao celular do Alex"
+  },
   "soon": {
     "title": "Em breve",
     "text": "Esta tela chega na próxima versão."
@@ -91,5 +160,76 @@
   "errors": {
     "generic": "Algo deu errado. Tente de novo.",
     "offline": "Não foi possível falar com o servidor."
+  },
+  "tour": {
+    "take": "Fazer o tour",
+    "counter": "{{current}} de {{total}}",
+    "skip": "Pular tour",
+    "next": "Próximo",
+    "explore": "Explorar sozinho",
+    "tapHint": "Toque no ponto destacado para continuar.",
+    "samProgress": "Sam está pegando os itens dele… {{done}} de {{total}}",
+    "samSync": "As marcações do Sam estão chegando neste celular…",
+    "list-card": {
+      "title": "Sua lista de compras",
+      "text": "Tudo que está acabando vem parar aqui sozinho: quantos itens, quantos zeraram e quanto vai custar, mais ou menos."
+    },
+    "fridge": {
+      "title": "Sua casa, por área",
+      "text": "Cada anel mostra o quanto a área está abastecida. Abra a Geladeira."
+    },
+    "use": {
+      "title": "Usou algo? Um toque.",
+      "text": "Acabou um litro de leite? Toque em Usar. É só isso que o Cella pede de você em casa, e dá para desfazer."
+    },
+    "to-list": {
+      "title": "Já está na lista",
+      "text": "O leite chegou no mínimo, então entrou sozinho na lista de compras. Abra a lista."
+    },
+    "corridors": {
+      "title": "Na ordem do seu mercado",
+      "text": "Os itens ficam agrupados pelos corredores do seu mercado, na ordem em que você anda. Nada de voltar pelo leite."
+    },
+    "start": {
+      "title": "No mercado",
+      "text": "Quando chegar, toque em Começar as compras. A lista vira um checklist."
+    },
+    "check": {
+      "title": "Um toque por item",
+      "text": "Toque no item quando ele entrar no carrinho. Toque de novo para tirar."
+    },
+    "split": {
+      "title": "Comprando junto?",
+      "text": "Divida a rota com o Sam: abra o menu, escolha Dividir a rota e depois Dividir. Cada pessoa fica com um bloco de corredores vizinhos."
+    },
+    "two-phones": {
+      "title": "Agora, os dois celulares",
+      "text": "O Sam tem o celular dele. Vamos colocar os dois lado a lado e ver a lista sincronizando."
+    },
+    "everyone": {
+      "title": "Acompanhe o Sam",
+      "text": "A sua rota tem só os seus corredores. Abra Todos para ver a parte do Sam também."
+    },
+    "sam": {
+      "title": "O Sam também está comprando",
+      "text": "Veja os itens dele sendo marcados aqui, no seu celular. Ninguém compra a mesma coisa duas vezes."
+    },
+    "finish": {
+      "title": "Tudo pronto",
+      "text": "Toque em Finalizar compras e depois em Finalizar. O que está no carrinho entra no estoque; o que faltou vai para a próxima lista."
+    },
+    "end": {
+      "title": "Esse é o Cella",
+      "text": "Sua despensa, na ordem do seu mercado. Continue explorando: esta cópia da demo é sua pelas próximas 24 horas."
+    }
+  },
+  "demo": {
+    "title": "Alex e Sam, no mesmo mercado",
+    "subtitle": "Dois celulares, uma lista. O que um marca aparece no outro em até 3 segundos.",
+    "back": "Voltar ao app",
+    "alexPhone": "Celular do Alex",
+    "samPhone": "Celular do Sam",
+    "alexLabel": "Alex · você",
+    "samLabel": "Sam"
   }
 }

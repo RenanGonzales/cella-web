@@ -70,6 +70,75 @@
     "undone": "Undone",
     "failed": "Could not save. Try again."
   },
+  "list": {
+    "title": "Shopping list",
+    "sortedBy": "Sorted by",
+    "sortedByCategory": "Sorted by category",
+    "other": "Other",
+    "add": "Add item",
+    "addTitle": "Add to the list",
+    "addConfirm": "Add to list",
+    "product": "Product",
+    "noProducts": "Every product is already on the list",
+    "close": "Close",
+    "toBuy": "To buy",
+    "bought": "In the cart",
+    "less": "Less",
+    "more": "More",
+    "remove": "Remove",
+    "save": "Save",
+    "editAria": "Edit {{name}}",
+    "optionsAria": "Options for {{name}}",
+    "ownerAria": "{{name}}'s route",
+    "noMarket": "Add a market to sort the list by its corridors and start shopping.",
+    "startShopping": "Start shopping",
+    "menu": "More options",
+    "split": "Split the route",
+    "cancelShopping": "Leave without buying",
+    "inCart": "In the cart",
+    "yourRoute": "your route",
+    "wholeList": "whole list",
+    "left_one": "{{count}} left",
+    "left_other": "{{count}} left",
+    "progress": "{{checked}} of {{total}} items in the cart",
+    "whose": "Whose items",
+    "myRoute": "My route · {{count}}",
+    "everyone": "Everyone · {{count}}",
+    "routeEmpty": "Nothing on your route. Check the whole list.",
+    "notFoundMeta": "Not found · moves to the next list",
+    "markNotFound": "Not found",
+    "foundIt": "Found it after all",
+    "putInCart": "In the cart",
+    "whoPicks": "Who picks it up",
+    "anyone": "Anyone",
+    "splitTitle": "Split the route",
+    "splitHint": "Each person gets a block of neighboring corridors, balanced by number of items. You take the first ones.",
+    "splitConfirm": "Split",
+    "leaveTitle": "Leave without buying?",
+    "leaveText": "Every item stays on the list. What was checked goes back to unchecked.",
+    "leaveConfirm": "Leave",
+    "keepShopping": "Keep shopping",
+    "finish": "Finish shopping",
+    "checkoutTitle": "Finish shopping?",
+    "notFound": "Not found",
+    "toPick": "Not picked",
+    "estimatedCart": "Cart estimate:",
+    "movesNext_one": "{{count}} item moves to your next list.",
+    "movesNext_other": "{{count}} items move to your next list.",
+    "cartEmpty": "The cart is empty: nothing will be added to your stock.",
+    "finishConfirm": "Finish",
+    "doneTitle": "Purchase saved",
+    "stockUp_one": "{{count}} item added to your stock",
+    "stockUp_other": "{{count}} items added to your stock",
+    "carried_one": "{{count}} item moved to your next list",
+    "carried_other": "{{count}} items moved to your next list",
+    "backHome": "Back home",
+    "changedElsewhere": "The list changed on another phone. It is up to date now.",
+    "finishedElsewhere": "The shopping was finished on another phone.",
+    "estimatedFromLast": "Estimated from the last prices. Add the real ones later in History.",
+    "switchToPartner": "Switch to Sam's phone",
+    "switchToMain": "Back to Alex's phone"
+  },
   "soon": {
     "title": "Coming soon",
     "text": "This screen arrives in the next version."
@@ -91,5 +160,76 @@
   "errors": {
     "generic": "Something went wrong. Try again.",
     "offline": "Cannot reach the server."
+  },
+  "tour": {
+    "take": "Take the tour",
+    "counter": "{{current}} of {{total}}",
+    "skip": "Skip tour",
+    "next": "Next",
+    "explore": "Explore on my own",
+    "tapHint": "Tap the highlighted spot to continue.",
+    "samProgress": "Sam is picking his items… {{done}} of {{total}}",
+    "samSync": "Sam's ticks are on their way to this phone…",
+    "list-card": {
+      "title": "Your shopping list",
+      "text": "Everything that runs low lands here on its own: how many items, how many ran out, and about how much they will cost."
+    },
+    "fridge": {
+      "title": "Your home, by area",
+      "text": "Each ring shows how stocked an area is. Open the Fridge."
+    },
+    "use": {
+      "title": "Used something? One tap.",
+      "text": "Finished a liter of milk? Tap Use. That is all Cella asks of you at home, and it can be undone."
+    },
+    "to-list": {
+      "title": "Already on the list",
+      "text": "The milk reached its minimum, so it went onto the shopping list by itself. Open the list."
+    },
+    "corridors": {
+      "title": "In the order of your market",
+      "text": "Items are grouped by the corridors of your market, in the order you walk them. No going back for the milk."
+    },
+    "start": {
+      "title": "At the market",
+      "text": "When you arrive, tap Start shopping. The list becomes a checklist."
+    },
+    "check": {
+      "title": "One tap per item",
+      "text": "Tap an item when it goes into the cart. Tap again to take it out."
+    },
+    "split": {
+      "title": "Shopping together?",
+      "text": "Split the route with Sam: open the menu, choose Split the route, then Split. Each person gets a block of neighboring corridors."
+    },
+    "two-phones": {
+      "title": "Now, both phones",
+      "text": "Sam has his own phone. Let's put them side by side and watch the list stay in sync."
+    },
+    "everyone": {
+      "title": "Follow Sam",
+      "text": "Your route has only your corridors. Open Everyone to see Sam's part too."
+    },
+    "sam": {
+      "title": "Sam is shopping too",
+      "text": "Watch his items get ticked here, on your phone. Nobody buys the same thing twice."
+    },
+    "finish": {
+      "title": "All done",
+      "text": "Tap Finish shopping, then Finish. What is in the cart goes into your stock; what was missing moves to the next list."
+    },
+    "end": {
+      "title": "That's Cella",
+      "text": "Your pantry, sorted by your market. Keep exploring: this copy of the demo is yours for the next 24 hours."
+    }
+  },
+  "demo": {
+    "title": "Alex and Sam, at the same market",
+    "subtitle": "Two phones, one list. What one person ticks shows up on the other within 3 seconds.",
+    "back": "Back to the app",
+    "alexPhone": "Alex's phone",
+    "samPhone": "Sam's phone",
+    "alexLabel": "Alex · you",
+    "samLabel": "Sam"
   }
 }

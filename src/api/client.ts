@@ -1,4 +1,25 @@
-const TOKEN_KEY = 'cella.token';
+/**
+ * Which person this copy of the app is logged in as. The demo shows Alex and Sam side by
+ * side, each in a frame of the same app: Sam's frame is opened with `?as=sam` and keeps
+ * that identity for its whole life (in-app navigation drops the query string).
+ */
+export type Persona = 'main' | 'partner';
+
+function readPersona(): Persona {
+  try {
+    return new URLSearchParams(window.location.search).get('as') === 'sam' ? 'partner' : 'main';
+  } catch {
+    return 'main';
+  }
+}
+
+export const persona: Persona = readPersona();
+
+const TOKEN_KEYS: Record<Persona, string> = {
+  main: 'cella.token',
+  partner: 'cella.token.partner',
+};
+const TOKEN_KEY = TOKEN_KEYS[persona];
 
 export const API_URL: string = import.meta.env.VITE_API_URL ?? '/cella/api';
 
@@ -12,28 +33,38 @@ export class ApiError extends Error {
   }
 }
 
+function readKey(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeKey(key: string, value: string | null): void {
+  try {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch {
+    // Private mode or blocked storage: the session simply ends with the tab.
+  }
+}
+
+/** Session of this copy of the app (Alex's, or Sam's inside the demo frames). */
 export const tokenStore = {
-  get(): string | null {
-    try {
-      return localStorage.getItem(TOKEN_KEY);
-    } catch {
-      return null;
-    }
-  },
-  set(token: string): void {
-    try {
-      localStorage.setItem(TOKEN_KEY, token);
-    } catch {
-      // Private mode or blocked storage: the session simply ends with the tab.
-    }
-  },
+  get: (): string | null => readKey(TOKEN_KEY),
+  set: (token: string): void => writeKey(TOKEN_KEY, token),
   clear(): void {
-    try {
-      localStorage.removeItem(TOKEN_KEY);
-    } catch {
-      // Nothing to clear.
-    }
+    writeKey(TOKEN_KEY, null);
+    // Leaving the demo as Alex also ends Sam's session.
+    if (persona === 'main') writeKey(TOKEN_KEYS.partner, null);
   },
+};
+
+/** Token of the demo's second person (Sam), kept so the demo can show and drive his phone. */
+export const partnerStore = {
+  get: (): string | null => readKey(TOKEN_KEYS.partner),
+  set: (token: string | null): void => writeKey(TOKEN_KEYS.partner, token),
 };
 
 let onUnauthorized: (() => void) | null = null;
@@ -45,12 +76,13 @@ export function setUnauthorizedHandler(handler: () => void): void {
 
 export async function api<T>(
   path: string,
-  options: { method?: string; body?: unknown; auth?: boolean } = {},
+  options: { method?: string; body?: unknown; auth?: boolean; token?: string } = {},
 ): Promise<T> {
   const { method = 'GET', body, auth = true } = options;
   const headers: Record<string, string> = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
-  const token = auth ? tokenStore.get() : null;
+  // `token` acts as someone else (the demo drives Sam's phone); it never logs this app out.
+  const token = options.token ?? (auth ? tokenStore.get() : null);
   if (token) headers.Authorization = `Bearer ${token}`;
 
   let response: Response;
@@ -64,7 +96,7 @@ export async function api<T>(
     throw new ApiError(0, 'offline');
   }
 
-  if (response.status === 401 && auth) onUnauthorized?.();
+  if (response.status === 401 && auth && !options.token) onUnauthorized?.();
   if (!response.ok) {
     const detail = await response
       .json()

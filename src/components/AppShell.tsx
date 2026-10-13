@@ -6,8 +6,11 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useMe, useProducts } from '../api/hooks';
 import { useAuth } from '../auth/AuthContext';
 import { areaStats } from '../lib/stats';
+import { useRestartTour } from '../lib/useRestartTour';
 import { glow, palette, theme } from '../theme';
 import { ConsumeProvider } from './ConsumeProvider';
+import { FocusModeProvider, useFocused } from './FocusMode';
+import { Tour } from './tour/Tour';
 import { Icon, Logo } from './ui';
 import type { IconName } from './ui';
 
@@ -33,33 +36,44 @@ function readCollapsed(): boolean {
 export function AppShell() {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   return (
-    <ConsumeProvider>
-      <Box sx={{ minHeight: '100dvh', bgcolor: palette.canvas, display: 'flex' }}>
-        {desktop && <Sidebar />}
-        <Box
-          component="main"
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            px: { xs: 1.5, md: 5 },
-            pt: { xs: 0, md: 4 },
-            pb: { xs: 14, md: 6 },
-          }}
-        >
-          {!desktop && <MobileHeader />}
-          <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-            <Outlet />
-          </Box>
+    <FocusModeProvider>
+      <ConsumeProvider>
+        <Shell desktop={desktop} />
+      </ConsumeProvider>
+    </FocusModeProvider>
+  );
+}
+
+function Shell({ desktop }: { desktop: boolean }) {
+  const focused = useFocused();
+  return (
+    <Box sx={{ minHeight: '100dvh', bgcolor: palette.canvas, display: 'flex' }}>
+      {desktop && <Sidebar />}
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          px: { xs: 1.5, md: 5 },
+          pt: { xs: 0, md: 4 },
+          pb: { xs: focused ? 3 : 14, md: 6 },
+        }}
+      >
+        {!desktop && !focused && <MobileHeader />}
+        <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+          <Outlet />
         </Box>
-        {!desktop && <BottomNav />}
       </Box>
-    </ConsumeProvider>
+      {!desktop && !focused && <BottomNav />}
+      <Tour />
+    </Box>
   );
 }
 
 function Sidebar() {
   const { t } = useTranslation();
   const { logout } = useAuth();
+  const tour = useRestartTour();
   const { data: me } = useMe();
   const { data: products = [] } = useProducts();
   const [collapsed, setCollapsed] = useState(readCollapsed);
@@ -194,6 +208,14 @@ function Sidebar() {
       </Box>
 
       <Box sx={{ mt: 'auto', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {tour && (
+          <NavButton
+            icon="tour"
+            label={t('tour.take')}
+            collapsed={collapsed}
+            onClick={tour.restart}
+          />
+        )}
         <NavButton icon="logout" label={t('nav.logout')} collapsed={collapsed} onClick={logout} />
       </Box>
     </Box>
@@ -217,6 +239,7 @@ function NavItem({
       component={NavLink}
       to={to}
       end={to === '/'}
+      data-tour={`nav-${to}`}
       aria-label={t(label)}
       sx={{
         height: 44,
@@ -327,6 +350,7 @@ function Avatars({ names }: { names: string[] }) {
 function MobileHeader() {
   const { t } = useTranslation();
   const { logout } = useAuth();
+  const tour = useRestartTour();
   return (
     <Box
       component="header"
@@ -340,6 +364,17 @@ function MobileHeader() {
       }}
     >
       <Logo size={32} />
+      <Box sx={{ flex: 1 }} />
+      {tour && (
+        <IconButton
+          onClick={tour.restart}
+          disabled={tour.busy}
+          aria-label={t('tour.take')}
+          sx={{ bgcolor: palette.surface, color: palette.navy, width: 44, height: 44, mr: 1 }}
+        >
+          <Icon name="tour" size={20} />
+        </IconButton>
+      )}
       <IconButton
         onClick={logout}
         aria-label={t('nav.logout')}
@@ -380,6 +415,7 @@ function BottomNav() {
           component={NavLink}
           to={item.to}
           end={item.to === '/'}
+          data-tour={`nav-${item.to}`}
           aria-label={t(item.label)}
           sx={{
             justifySelf: 'center',

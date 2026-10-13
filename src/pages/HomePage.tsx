@@ -41,6 +41,7 @@ export function HomePage() {
       <ButtonBase
         component={RouterLink}
         to="/list"
+        data-tour="home-list"
         sx={{ display: 'block', textAlign: 'left', borderRadius: '30px', color: 'inherit' }}
       >
         <Card highlight padding={3}>
@@ -122,6 +123,7 @@ export function HomePage() {
                     key={area.id}
                     component={RouterLink}
                     to={`/areas/${area.id}`}
+                    data-tour={`area-${area.name}`}
                     sx={{
                       height: { xs: 140, md: 168 },
                       p: 2.25,

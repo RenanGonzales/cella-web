@@ -2,10 +2,12 @@ import { Button, Snackbar } from '@mui/material';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 import { useConsume, useUndo } from '../api/hooks';
 import type { Product } from '../api/types';
 import { formatQuantity } from '../lib/format';
+import { emitTourEvent } from '../lib/tour';
 
 type Feedback =
   { kind: 'done'; message: string; eventId: string } | { kind: 'info'; message: string };
@@ -20,7 +22,14 @@ export function ConsumeProvider({ children }: { children: ReactNode }) {
   const { t, i18n } = useTranslation();
   const consumeMutation = useConsume();
   const undoMutation = useUndo();
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [shown, setShown] = useState<{ feedback: Feedback; path: string } | null>(null);
+  const { pathname } = useLocation();
+  // "Undo" belongs to the screen where the item was used: leaving it hides the message.
+  const feedback = shown?.path === pathname ? shown.feedback : null;
+  const setFeedback = useCallback(
+    (next: Feedback | null) => setShown(next ? { feedback: next, path: pathname } : null),
+    [pathname],
+  );
 
   const consume = useCallback(
     (product: Product) => {
@@ -36,6 +45,7 @@ export function ConsumeProvider({ children }: { children: ReactNode }) {
             data.product.unit,
             i18n.language,
           );
+          emitTourEvent('consumed');
           setFeedback({
             kind: 'done',
             message: t('consume.done', { name, left }),
@@ -45,7 +55,7 @@ export function ConsumeProvider({ children }: { children: ReactNode }) {
         onError: () => setFeedback({ kind: 'info', message: t('consume.failed') }),
       });
     },
-    [consumeMutation, i18n.language, t],
+    [consumeMutation, i18n.language, setFeedback, t],
   );
 
   const undo = (eventId: string) => {

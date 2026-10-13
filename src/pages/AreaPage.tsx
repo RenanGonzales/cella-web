@@ -171,6 +171,7 @@ function ProductCard({ product, onUse }: { product: Product; onUse: () => void }
         <Button
           variant="contained"
           onClick={onUse}
+          data-tour={`use-${product.name}`}
           disabled={product.current_quantity <= 0}
           aria-label={t('area.useAria', { amount, name: product.name })}
         >

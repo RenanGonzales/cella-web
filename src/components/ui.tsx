@@ -166,6 +166,9 @@ const ICONS = {
   panel: 'M6.5 4.5h11a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3h-11a3 3 0 0 1-3-3v-9a3 3 0 0 1 3-3zM9.5 4.5v15',
   logout: 'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h10',
   plus: 'M12 5v14M5 12h14',
+  tour: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM10 8.5l5 3.5-5 3.5z',
+  next: 'M5 12h14M13 6l6 6-6 6',
+  more: 'M6 12h.01M12 12h.01M18 12h.01',
 } as const;
 
 export type IconName = keyof typeof ICONS;

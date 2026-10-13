@@ -17,7 +17,7 @@ Frontend for **Cella**, a household supplies manager. Track what you have at hom
 
 ## Getting started
 
-Requirements: Node 20+ and the [cella-api](https://github.com/RenanGonzales/cella-api) running locally with `DEMO_ENABLED=true`.
+Requirements: Node 20+ and the [cella-api](https://github.com/RenanGonzales/cella-api) (0.7.0 or later) running locally with `DEMO_ENABLED=true`.
 
 ```bash
 npm install
@@ -25,7 +25,7 @@ cp .env.example .env   # VITE_API_URL=http://localhost:8000
 npm run dev            # http://localhost:5173/cella/
 ```
 
-Click **Try the demo** to log in as the demo household.
+Click **Try the demo**: the API creates a private demo household for you (Alex and Sam). Take the tour from the intro or from the menu; on a large screen it ends on the two-phone page (`/cella/demo`).
 
 ## Scripts
 
@@ -51,10 +51,10 @@ Click **Try the demo** to log in as the demo household.
 src/
   api/         fetch client, types and TanStack Query hooks
   auth/        session context (JWT in localStorage, logout on 401)
-  components/  design system (cards, rings, bars), app shell, logo intro
+  components/  design system (cards, rings, bars), app shell, logo intro, list, tour
   i18n/        en and pt-BR
-  lib/         formatting and stock statistics
-  pages/       login, welcome, home, storage area
+  lib/         formatting, stock statistics, tour state, Sam's automation
+  pages/       login, welcome, home, storage area, shopping list, two-phone demo
   test/        test setup, factories and app-level tests
 ```
 
@@ -63,11 +63,13 @@ src/
 - [x] **Demo intro:** animated logo, then take the tour or explore
 - [x] **Home:** shopping list summary, storage areas with stock rings, items running low
 - [x] **Storage area:** one tap to consume, with undo
-- [ ] **Shopping list:** sorted by the corridors of the selected market, with usual brand and last price
-- [ ] **Split:** each household member sees only their own route
-- [ ] **Checkout:** confirm quantities in the store, fine-tune prices later
+- [x] **Shopping list:** sorted by the corridors of the selected market, with usual brand and last price
+- [x] **In the store:** one tap per item, not found, quantity bought
+- [x] **Split:** each household member sees only their own route, live across phones
+- [x] **Checkout:** stock goes up, what was missing moves to the next list
+- [x] **Guided tour:** spotlight on one spot at a time, with captions
+- [x] **Two phones:** Alex and Sam side by side on large screens, Sam shopping live
 - [ ] **Catalog and market setup:** products, corridors and category mapping
-- [ ] **Guided tour** of the demo
 
 ## Related
 

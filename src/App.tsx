@@ -5,7 +5,9 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import { AppShell } from './components/AppShell';
 import { AreaPage } from './pages/AreaPage';
+import { DemoPage } from './pages/DemoPage';
 import { HomePage } from './pages/HomePage';
+import { ListPage } from './pages/ListPage';
 import { LoginPage } from './pages/LoginPage';
 import { SoonPage } from './pages/SoonPage';
 import { WelcomePage } from './pages/WelcomePage';
@@ -43,6 +45,14 @@ export function AppRoutes() {
         }
       />
       <Route
+        path="/demo"
+        element={
+          <RequireAuth>
+            <DemoPage />
+          </RequireAuth>
+        }
+      />
+      <Route
         element={
           <RequireAuth>
             <AppShell />
@@ -51,7 +61,7 @@ export function AppRoutes() {
       >
         <Route index element={<HomePage />} />
         <Route path="areas/:areaId" element={<AreaPage />} />
-        <Route path="list" element={<SoonPage titleKey="nav.list" />} />
+        <Route path="list" element={<ListPage />} />
         <Route path="products" element={<SoonPage titleKey="nav.products" />} />
         <Route path="markets" element={<SoonPage titleKey="nav.markets" />} />
         <Route path="history" element={<SoonPage titleKey="nav.history" />} />

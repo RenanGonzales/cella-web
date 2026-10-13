@@ -1,17 +1,12 @@
-import { ThemeProvider } from '@mui/material';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import '../i18n';
 import i18n from '../i18n';
-import { AppRoutes } from '../App';
 import type { Product, ShoppingList } from '../api/types';
-import { AuthProvider } from '../auth/AuthContext';
-import { theme } from '../theme';
 import { makeProduct } from './factories';
+import { apiPath, json, renderApp } from './render';
 
 const fridge = { id: 'fridge', name: 'Fridge', position: 0 };
 const pantry = { id: 'pantry', name: 'Pantry', position: 1 };
@@ -49,19 +44,17 @@ function fakeApi(products: Product[]) {
   const calls: string[] = [];
 
   const handler = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = String(input)
-      .replace(/^https?:\/\/[^/]+/, '')
-      .replace(/^\/cella\/api/, '');
+    const url = apiPath(input);
     const method = init?.method ?? 'GET';
     calls.push(`${method} ${url}`);
-    const json = (body: unknown, status = 200) =>
-      new Response(JSON.stringify(body), {
-        status,
-        headers: { 'Content-Type': 'application/json' },
-      });
 
     if (url === '/auth/demo')
-      return json({ access_token: 'token', token_type: 'bearer', expires_in: 1 });
+      return json({
+        access_token: 'token',
+        token_type: 'bearer',
+        expires_in: 1,
+        partner: { id: 'sam', name: 'Sam', access_token: 'sam-token' },
+      });
     if (url === '/me')
       return json({
         id: 'alex',
@@ -99,21 +92,6 @@ function fakeApi(products: Product[]) {
 
   vi.stubGlobal('fetch', handler);
   return { calls };
-}
-
-function renderApp(path: string) {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
-    <ThemeProvider theme={theme}>
-      <QueryClientProvider client={client}>
-        <AuthProvider>
-          <MemoryRouter initialEntries={[path]}>
-            <AppRoutes />
-          </MemoryRouter>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>,
-  );
 }
 
 let products: Product[];
