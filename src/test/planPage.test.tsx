@@ -88,6 +88,7 @@ function fakeApi() {
           name: 'Alex',
           email: 'a@x',
           household: { id: 'h', name: 'H', invite_code: 'X', members: [] },
+          features: { receipt_ai: false, is_demo: true },
         });
       if (path === '/products') return json([]);
       if (path === '/shopping-list')
@@ -206,7 +207,7 @@ describe('Floor plan editor', () => {
     await user.click(piece('Dairy'));
     await user.click(screen.getByRole('button', { name: 'Duplicate below' }));
     expect(screen.getByText('3 stops · 1 category without a place')).toBeInTheDocument();
-    expect(screen.getByText('14 deep')).toBeInTheDocument();
+    expect(screen.getByText(/^12 × 14 cells/)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => expect(api.puts).toHaveLength(1));

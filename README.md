@@ -17,7 +17,7 @@ Frontend for **Cella**, a household supplies manager. Track what you have at hom
 
 ## Getting started
 
-Requirements: Node 20+ and the [cella-api](https://github.com/RenanGonzales/cella-api) (0.8.0 or later) running locally with `DEMO_ENABLED=true`.
+Requirements: Node 20+ and the [cella-api](https://github.com/RenanGonzales/cella-api) (0.10.0 or later) running locally with `DEMO_ENABLED=true`.
 
 ```bash
 npm install
@@ -53,8 +53,8 @@ src/
   auth/        session context (JWT in localStorage, logout on 401)
   components/  design system (cards, rings, bars), app shell, logo intro, list, tour
   i18n/        en and pt-BR
-  lib/         formatting, stock statistics, floor plan and route engine, tour state, Sam's automation
-  pages/       login, welcome, home, storage area, shopping list, products, markets, floor plan, two-phone demo
+  lib/         formatting, stock statistics, floor plan and route engine, receipt review, spending, tour state, Sam's automation
+  pages/       login, join, welcome, home, storage area, shopping list, products, markets, floor plan, history, two-phone demo
   test/        test setup, factories and app-level tests
 ```
 
@@ -71,7 +71,10 @@ src/
 - [x] **Two phones:** Alex and Sam side by side on large screens, Sam shopping live
 - [x] **Catalog:** products with stock rules, categories, markets
 - [x] **Market floor plan:** modular plan editor, zigzag route (also wholesale 2 x 8)
-- [ ] **History:** purchases, prices, monthly spending, household invite
+- [x] **Receipt:** prices from the receipt, reviewed before saving (sample receipt in the demo; a photo read by Claude for enabled accounts)
+- [x] **History:** purchases by month, spending per month, price history of each product
+- [x] **Home figures:** spent this month, used this week; stock above the ideal shown as "+20 over ideal"
+- [x] **Invite:** invite link and code; joining a household from the link
 
 ## Related
 

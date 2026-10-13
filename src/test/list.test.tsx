@@ -100,6 +100,13 @@ describe('Shopping list in the store', () => {
     renderApp('/list');
 
     await user.click(await screen.findByRole('button', { name: 'Start shopping' }));
+    // Asks where: the market sorting the list comes selected.
+    const where = screen.getByRole('radiogroup', { name: 'Where are you shopping?' });
+    expect(within(where).getByRole('radio', { name: /Neighborhood Market/ })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    await user.click(screen.getByRole('button', { name: 'Start' }));
 
     expect(await screen.findByRole('button', { name: 'Finish shopping' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: MARKET.name })).toBeInTheDocument();
@@ -109,6 +116,33 @@ describe('Shopping list in the store', () => {
       path: '/shopping-list/start',
       body: { market_id: MARKET.id },
     });
+  });
+
+  it('can shop somewhere without a market, grouped by category', async () => {
+    const api = fakeShoppingApi();
+    const user = userEvent.setup();
+    renderApp('/list');
+
+    await user.click(await screen.findByRole('button', { name: 'Start shopping' }));
+    await user.click(screen.getByRole('radio', { name: /Somewhere else/ }));
+    await user.click(screen.getByRole('button', { name: 'Start' }));
+
+    expect(await screen.findByRole('heading', { name: 'Shopping' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Dairy' })).toBeInTheDocument();
+    expect(api.writes()).toContainEqual({
+      method: 'POST',
+      path: '/shopping-list/start',
+      body: { market_id: null },
+    });
+    expect(localStorage.getItem('cella.market')).toBe('none');
+  });
+
+  it('shows why each item is on the list: stock, minimum and ideal', async () => {
+    fakeShoppingApi();
+    renderApp('/list');
+
+    const milk = await screen.findByRole('button', { name: 'Edit Whole milk' });
+    expect(milk).toHaveTextContent('Has 2 L · min 2 L · ideal 6 L');
   });
 
   it('checks items off and marks one as not found', async () => {

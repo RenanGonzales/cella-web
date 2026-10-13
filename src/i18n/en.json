@@ -61,7 +61,8 @@
     "useAria": "Use {{amount}} of {{name}}",
     "ofIdeal": "of {{ideal}}",
     "onList": "On the list",
-    "min": "min {{value}}"
+    "min": "min {{value}}",
+    "overIdeal": "+{{over}} over ideal"
   },
   "consume": {
     "done": "{{name}} used · {{left}} left",
@@ -73,7 +74,6 @@
   "list": {
     "title": "Shopping list",
     "sortedBy": "Sorted by",
-    "sortedByCategory": "Sorted by category",
     "other": "Other",
     "add": "Add item",
     "addTitle": "Add to the list",
@@ -90,7 +90,6 @@
     "editAria": "Edit {{name}}",
     "optionsAria": "Options for {{name}}",
     "ownerAria": "{{name}}'s route",
-    "noMarket": "Add a market to sort the list by its corridors and start shopping.",
     "startShopping": "Start shopping",
     "menu": "More options",
     "split": "Split the route",
@@ -137,11 +136,20 @@
     "finishedElsewhere": "The shopping was finished on another phone.",
     "estimatedFromLast": "Estimated from the last prices. Add the real ones later in History.",
     "switchToPartner": "Switch to Sam's phone",
-    "switchToMain": "Back to Alex's phone"
-  },
-  "soon": {
-    "title": "Coming soon",
-    "text": "This screen arrives in the next version."
+    "switchToMain": "Back to Alex's phone",
+    "has": "has {{value}}",
+    "stockLine": "Has {{current}} · min {{min}} · ideal {{ideal}}",
+    "toBuyShort": "to buy",
+    "noMarketOption": "No market",
+    "manageMarkets": "Markets",
+    "noMarketTitle": "Shopping",
+    "whereTitle": "Where are you shopping?",
+    "withPlan": "Floor plan · list in walking order",
+    "corridorCount_one": "{{count}} corridor",
+    "corridorCount_other": "{{count}} corridors",
+    "elsewhere": "Somewhere else",
+    "elsewhereHint": "No plan: the list goes by category",
+    "startConfirm": "Start"
   },
   "areas": {
     "Fridge": "Fridge",
@@ -217,6 +225,14 @@
     "finish": {
       "title": "All done",
       "text": "Tap Finish shopping, then Finish. What is in the cart goes into your stock; what was missing moves to the next list."
+    },
+    "receipt": {
+      "title": "Prices from the receipt",
+      "text": "At home, add the receipt: each line is matched to a product and its price is saved. In this demo it is a sample receipt; with a real account, a photo is read by Claude."
+    },
+    "receipt-review": {
+      "title": "Check, then save",
+      "text": "Arrows show how each price moved since last time. Nothing is saved until you confirm: tap Save prices."
     },
     "end": {
       "title": "That's Cella",
@@ -320,15 +336,6 @@
       "layout": "Layout",
       "route": "Route"
     },
-    "size": "Market size",
-    "cols_one": "{{count}} wide",
-    "cols_other": "{{count}} wide",
-    "rows_one": "{{count}} deep",
-    "rows_other": "{{count}} deep",
-    "fewerCols": "Narrower",
-    "moreCols": "Wider",
-    "fewerRows": "Shallower",
-    "moreRows": "Deeper",
     "zigzag": "Zigzag",
     "styles": {
       "column": "Through the cross aisle",
@@ -384,9 +391,144 @@
     "discard": "Leave",
     "yourRoute": "Your route",
     "editLarger": "Edit on a larger screen",
-    "duplicateRight": "Duplicate right",
-    "duplicateBelow": "Duplicate below",
     "summary_one": "{{stops}} stops · {{count}} category without a place",
-    "summary_other": "{{stops}} stops · {{count}} categories without a place"
+    "summary_other": "{{stops}} stops · {{count}} categories without a place",
+    "sizeLabel": "{{cols}} × {{rows}} cells · + and − on each edge resize it",
+    "duplicateTo": {
+      "left": "Duplicate to the left",
+      "right": "Duplicate to the right",
+      "up": "Duplicate above",
+      "down": "Duplicate below"
+    },
+    "edges": {
+      "top": {
+        "name": "Top edge",
+        "add": "Add a row at the top",
+        "remove": "Remove the top row"
+      },
+      "bottom": {
+        "name": "Bottom edge",
+        "add": "Add a row at the bottom",
+        "remove": "Remove the bottom row"
+      },
+      "left": {
+        "name": "Left edge",
+        "add": "Add a column on the left",
+        "remove": "Remove the left column"
+      },
+      "right": {
+        "name": "Right edge",
+        "add": "Add a column on the right",
+        "remove": "Remove the right column"
+      }
+    }
+  },
+  "health": {
+    "full": "Full",
+    "good": "Good",
+    "low": "Low",
+    "out": "Out",
+    "onList": "on the list",
+    "min": "Min {{value}}",
+    "minZero": "Buys when it runs out",
+    "ideal": "Ideal {{value}}",
+    "aria": "{{current}} in stock · minimum {{min}} · ideal {{ideal}}"
+  },
+  "receipt": {
+    "add": "Add the receipt",
+    "again": "Review the receipt",
+    "title": "Prices from the receipt",
+    "intro": "Take a photo of the receipt: Claude reads each line and matches it to your products. You check everything before it is saved.",
+    "privacy": "The photo is not stored, only the prices you confirm.",
+    "photo": "Take a photo",
+    "useSample": "Use a sample receipt",
+    "reading": "Reading the receipt…",
+    "readError": "Could not read this receipt. Try another photo, or use the sample.",
+    "reviewTitle": "Check the receipt",
+    "sampleBadge": "Sample receipt",
+    "sampleHint": "In the demo, the receipt is a sample made from what you bought. Each line is matched to a product; the arrows show how the price moved since last time.",
+    "reviewHint": "Each line was matched to a product. Fix any match or price, then save.",
+    "lines": "Receipt lines",
+    "productOf": "Product for {{line}}",
+    "priceOf": "Price of {{line}}",
+    "notAProduct": "Not a product",
+    "previous": "Last time {{price}}",
+    "same": "Same price",
+    "up": "↑ {{percent}}%",
+    "down": "↓ {{percent}}%",
+    "total": "Receipt total",
+    "linesDiffer": "The lines add up to {{lines}}.",
+    "missing_one": "{{names}} has no line and keeps its last price.",
+    "missing_other": "{{count}} products have no line and keep their last price: {{names}}.",
+    "repeated": "{{names}} is on more than one line: pick one.",
+    "invalid": "Some prices are not valid numbers.",
+    "saveError": "Could not save. Check your connection and try again.",
+    "updatesPrices": "Saved prices become each product's last price, so the next list is estimated with them.",
+    "cancel": "Cancel",
+    "save": "Save prices",
+    "savedNote": "Paid, from the receipt. Prices updated."
+  },
+  "spending": {
+    "spentIn": "Spent in {{month}}",
+    "trips_one": "{{count}} trip to the market",
+    "trips_other": "{{count}} trips to the market",
+    "chart": "Spending per month: {{months}}",
+    "vs": "vs {{amount}} in {{month}}"
+  },
+  "used": {
+    "title": "Used this week",
+    "taps_one": "use",
+    "taps_other": "uses",
+    "none": "Nothing used in the last 7 days.",
+    "units_one": "unit",
+    "units_other": "units"
+  },
+  "history": {
+    "title": "History",
+    "summary_one": "{{count}} purchase",
+    "summary_other": "{{count}} purchases",
+    "empty": "No purchases yet. They show up here after each checkout.",
+    "open": "Purchase of {{date}} at {{market}}",
+    "noMarket": "Somewhere else",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "withReceipt": "receipt",
+    "close": "Close",
+    "noPrice": "No price",
+    "paid": "Paid",
+    "total": "Total of priced items",
+    "source": {
+      "sample": "Prices from the sample receipt.",
+      "ai": "Prices read from the receipt photo.",
+      "manual": "Prices typed in by hand."
+    }
+  },
+  "invite": {
+    "open": "Invite someone",
+    "title": "Invite to {{household}}",
+    "text": "Whoever opens the link creates an account and shares this home: the stock, the list and the shopping route.",
+    "demo": "This is a demo copy that is deleted after 24 hours, so nobody can join it. In a real household, this link adds a person to your home.",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "done": "Done"
+  },
+  "join": {
+    "title": "Join a household",
+    "text": "You were invited to share a home on Cella. Create your account to start.",
+    "name": "Your name",
+    "code": "Invite code",
+    "submit": "Create account and join",
+    "passwordHint": "At least {{count}} characters",
+    "passwordShort": "The password needs at least {{count}} characters.",
+    "codeNotFound": "This invite code does not exist. Check it with whoever invited you.",
+    "emailTaken": "There is already an account with this email.",
+    "invalid": "Check the fields and try again.",
+    "haveAccount": "I already have an account"
+  },
+  "prices": {
+    "title": "Price history",
+    "up": "up {{percent}}% in {{count}} purchases",
+    "down": "down {{percent}}% in {{count}} purchases",
+    "chart": "From {{from}} to {{to}} in {{count}} purchases"
   }
 }

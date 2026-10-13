@@ -17,9 +17,10 @@ import {
 import type { Category, Product } from '../api/types';
 import { ProductDialog } from '../components/catalog/ProductDialog';
 import { Pill } from '../components/list/ItemDialog';
+import { StockMeter } from '../components/StockMeter';
 import { Icon } from '../components/ui';
 import { formatQuantity } from '../lib/format';
-import { stockRatio } from '../lib/stats';
+import { stockOf } from '../lib/stats';
 import { palette } from '../theme';
 
 /** Lowercase without accents, so "acucar" finds "Açúcar". */
@@ -338,23 +339,8 @@ function ProductRow({
             {formatQuantity(product.ideal_quantity, product.unit, locale)}
           </Box>
         </Box>
-        <Box
-          aria-hidden="true"
-          sx={{
-            width: '100%',
-            height: 6,
-            borderRadius: 3,
-            bgcolor: palette.track,
-            overflow: 'hidden',
-          }}
-        >
-          <Box
-            sx={{
-              height: 6,
-              width: `${stockRatio(product) * 100}%`,
-              bgcolor: product.needs_restock ? palette.steel : palette.navy,
-            }}
-          />
+        <Box sx={{ width: '100%' }}>
+          <StockMeter stock={stockOf(product)} height={6} />
         </Box>
       </Box>
     </ButtonBase>

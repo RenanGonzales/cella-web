@@ -6,9 +6,12 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useMe, useProducts, useShoppingList, useStorageAreas } from '../api/hooks';
 import type { Product } from '../api/types';
 import { useConsumeAction } from '../components/ConsumeProvider';
+import { SpendingCard } from '../components/history/SpendingCard';
+import { UsedThisWeek } from '../components/history/UsedThisWeek';
+import { StockMeter } from '../components/StockMeter';
 import { BigNumber, Card, Icon, Money, SegmentBar, StockRing } from '../components/ui';
 import { formatQuantity, splitMoney } from '../lib/format';
-import { areaStats, listStats, runningLow, stockRatio } from '../lib/stats';
+import { areaStats, listStats, runningLow, stockOf } from '../lib/stats';
 import { palette } from '../theme';
 
 export function HomePage() {
@@ -200,6 +203,15 @@ export function HomePage() {
           </Box>
         )}
       </Box>
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.75, alignItems: 'stretch' }}>
+        <Box sx={{ flex: '3 1 340px', minWidth: 0 }}>
+          <SpendingCard link />
+        </Box>
+        <Box sx={{ flex: '2 1 260px', minWidth: 0 }}>
+          <UsedThisWeek />
+        </Box>
+      </Box>
     </Box>
   );
 }
@@ -227,7 +239,6 @@ function LowRow({
   locale: string;
 }) {
   const { t } = useTranslation();
-  const ratio = stockRatio(product);
   const amount = formatQuantity(product.consume_step, product.unit, locale);
   return (
     <Box
@@ -257,19 +268,7 @@ function LowRow({
             {formatQuantity(product.ideal_quantity, product.unit, locale)}
           </Box>
         </Box>
-        <Box
-          aria-hidden="true"
-          sx={{ height: 6, borderRadius: 3, bgcolor: palette.track, overflow: 'hidden' }}
-        >
-          <Box
-            sx={{
-              height: 6,
-              width: `${ratio * 100}%`,
-              bgcolor: ratio === 0 ? palette.navy : palette.steel,
-              transition: 'width .3s ease',
-            }}
-          />
-        </Box>
+        <StockMeter stock={stockOf(product)} height={6} />
       </Box>
       <Button
         size="small"

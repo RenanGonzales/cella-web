@@ -8,6 +8,7 @@ import {
   freeSpot,
   layoutBody,
   planFromLayout,
+  resizeSide,
   routeOf,
   transform,
   uniqueName,
@@ -129,7 +130,7 @@ describe('editing the plan', () => {
     const result = duplicate(
       plan(row, { rows: 8 }),
       row.map((x) => x.key),
-      'below',
+      'down',
     )!;
     const copies = result.pieces.filter((x) => result.copies.includes(x.key));
     expect(new Set(copies.map((x) => x.y))).toEqual(new Set([7]));
@@ -150,11 +151,35 @@ describe('editing the plan', () => {
       ],
       { cols: 8, rows: 8 },
     );
-    const result = duplicate(p, ['a', 'b'], 'below')!;
+    const result = duplicate(p, ['a', 'b'], 'down')!;
     const y = (key: string) => result.pieces.find((x) => x.key === key)!.y;
     expect(result.copies.map(y)).toEqual([7, 7]); // right under the originals
     expect([y('in'), y('out')]).toEqual([13, 13]); // after a free lane row
     expect(result.rows).toBe(14);
+  });
+
+  it('copies to the left and up too, growing the grid on that side', () => {
+    const p = plan([piece('a', 0, 0, 1, 5), piece('in', 2, 6, 2, 1, 'entrance')], {
+      cols: 6,
+      rows: 7,
+    });
+    const left = duplicate(p, ['a'], 'left')!;
+    const at = (r: typeof left, key: string) => r.pieces.find((x) => x.key === key)!;
+    expect(left.cols).toBe(8); // two more columns on the left
+    expect([at(left, left.copies[0]!).x, at(left, 'a').x, at(left, 'in').x]).toEqual([0, 2, 4]);
+    const up = duplicate(p, ['a'], 'up')!;
+    expect(up.rows).toBe(13);
+    expect([at(up, up.copies[0]!).y, at(up, 'a').y]).toEqual([0, 6]);
+  });
+
+  it('grows or shrinks any side, never cutting a piece', () => {
+    const p = plan([piece('a', 0, 1, 1, 3)], { cols: 6, rows: 6 });
+    const wider = resizeSide(p, 'left', 1)!;
+    expect([wider.cols, wider.pieces[0]!.x]).toEqual([7, 1]);
+    expect(resizeSide(p, 'left', -1)).toBeNull(); // the aisle touches the left edge
+    const shorter = resizeSide(p, 'top', -1)!;
+    expect([shorter.rows, shorter.pieces[0]!.y]).toEqual([5, 0]);
+    expect(resizeSide(plan([], { cols: 4, rows: 4 }), 'right', -1)).toBeNull(); // minimum size
   });
 
   it('refuses to grow past the largest market', () => {

@@ -10,6 +10,7 @@ import { useRestartTour } from '../lib/useRestartTour';
 import { glow, palette, theme } from '../theme';
 import { ConsumeProvider } from './ConsumeProvider';
 import { FocusModeProvider, useFocused } from './FocusMode';
+import { InviteDialog } from './InviteDialog';
 import { Tour } from './tour/Tour';
 import { Icon, Logo } from './ui';
 import type { IconName } from './ui';
@@ -79,6 +80,7 @@ function Sidebar() {
   const { data: products = [] } = useProducts();
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const [search, setSearch] = useState('');
+  const [inviteOpen, setInviteOpen] = useState(false);
   // The sidebar search opens the products screen, filtered.
   const searchProducts = () => {
     navigate(search.trim() ? `/products?q=${encodeURIComponent(search.trim())}` : '/products');
@@ -164,7 +166,13 @@ function Sidebar() {
           </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
             <MiniStat label={t('nav.stocked')} value={`${stocked}`} suffix="%" />
-            <MiniStat label={t('nav.invite')} value={me.household.invite_code} />
+            <ButtonBase
+              onClick={() => setInviteOpen(true)}
+              aria-label={t('invite.open')}
+              sx={{ display: 'block', textAlign: 'left', borderRadius: '14px', color: 'inherit' }}
+            >
+              <MiniStat label={t('nav.invite')} value={me.household.invite_code} />
+            </ButtonBase>
           </Box>
         </Box>
       )}
@@ -229,6 +237,7 @@ function Sidebar() {
         )}
         <NavButton icon="logout" label={t('nav.logout')} collapsed={collapsed} onClick={logout} />
       </Box>
+      {inviteOpen && me && <InviteDialog me={me} onClose={() => setInviteOpen(false)} />}
     </Box>
   );
 }
@@ -362,6 +371,8 @@ function MobileHeader() {
   const { t } = useTranslation();
   const { logout } = useAuth();
   const tour = useRestartTour();
+  const { data: me } = useMe();
+  const [inviteOpen, setInviteOpen] = useState(false);
   return (
     <Box
       component="header"
@@ -376,6 +387,15 @@ function MobileHeader() {
     >
       <Logo size={32} />
       <Box sx={{ flex: 1 }} />
+      {me && (
+        <IconButton
+          onClick={() => setInviteOpen(true)}
+          aria-label={t('invite.open')}
+          sx={{ bgcolor: palette.surface, color: palette.navy, width: 44, height: 44, mr: 1 }}
+        >
+          <Icon name="invite" size={20} />
+        </IconButton>
+      )}
       {tour && (
         <IconButton
           onClick={tour.restart}
@@ -393,6 +413,7 @@ function MobileHeader() {
       >
         <Icon name="logout" size={20} />
       </IconButton>
+      {inviteOpen && me && <InviteDialog me={me} onClose={() => setInviteOpen(false)} />}
     </Box>
   );
 }

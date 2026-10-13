@@ -9,6 +9,13 @@ interface AuthState {
   isLoggedIn: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginDemo: () => Promise<void>;
+  /** Create an account inside a household, by its invite code. */
+  join: (input: {
+    name: string;
+    email: string;
+    password: string;
+    inviteCode: string;
+  }) => Promise<void>;
   logout: () => void;
 }
 
@@ -55,9 +62,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     start(session);
   }, [start]);
 
+  const join = useCallback(
+    async (input: { name: string; email: string; password: string; inviteCode: string }) => {
+      start(
+        await api<TokenResponse>('/auth/register', {
+          method: 'POST',
+          body: {
+            name: input.name,
+            email: input.email,
+            password: input.password,
+            invite_code: input.inviteCode,
+          },
+          auth: false,
+        }),
+      );
+    },
+    [start],
+  );
+
   const value = useMemo(
-    () => ({ isLoggedIn, login, loginDemo, logout }),
-    [isLoggedIn, login, loginDemo, logout],
+    () => ({ isLoggedIn, login, loginDemo, join, logout }),
+    [isLoggedIn, login, loginDemo, join, logout],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

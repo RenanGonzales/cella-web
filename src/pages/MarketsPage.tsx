@@ -15,7 +15,7 @@ import type { Market } from '../api/types';
 import { MarketDialog } from '../components/catalog/MarketDialog';
 import { Pill } from '../components/list/ItemDialog';
 import { Icon } from '../components/ui';
-import { MARKET_KEY } from '../lib/shopping';
+import { MARKET_KEY, NO_MARKET } from '../lib/shopping';
 import { useStoredString } from '../lib/storage';
 import { glow, palette } from '../theme';
 
@@ -34,7 +34,10 @@ export function MarketsPage() {
   const [message, setMessage] = useState<string | null>(null);
 
   // Same rule as the list: the remembered market, else the first one.
-  const sortingId = active.find((market) => market.id === storedMarket)?.id ?? active[0]?.id;
+  const sortingId =
+    storedMarket === NO_MARKET
+      ? undefined
+      : (active.find((market) => market.id === storedMarket)?.id ?? active[0]?.id);
   const markets = showArchived ? archived : active;
   const busy =
     createMarket.isPending ||

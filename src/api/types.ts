@@ -23,6 +23,8 @@ export interface Me {
   name: string;
   email: string;
   household: { id: string; name: string; invite_code: string; members: Member[] };
+  /** What this account can use: the app only shows what works. */
+  features: { receipt_ai: boolean; is_demo: boolean };
 }
 
 export interface StorageArea {
@@ -100,6 +102,10 @@ export interface ShoppingListItem {
   added_manually: boolean;
   assigned_user_id: string | null;
   last_price_cents: number | null;
+  /** The product's stock: why the item is on the list and how much is enough. */
+  current_quantity: number;
+  min_quantity: number;
+  ideal_quantity: number;
 }
 
 export interface ShoppingListGroup {
@@ -142,4 +148,92 @@ export interface CheckoutResponse {
   items_carried_over: number;
   total_cents: number;
   items_without_price: number;
+}
+
+// --- Purchases and receipts -----------------------------------------------
+
+export type ReceiptSource = 'sample' | 'ai' | 'manual';
+
+export interface PurchaseSummary {
+  id: string;
+  market_id: string | null;
+  market_name: string | null;
+  started_at: string | null;
+  completed_at: string;
+  items_bought: number;
+  items_without_price: number;
+  total_cents: number;
+  receipt_source: ReceiptSource | null;
+  receipt_total_cents: number | null;
+  /** The receipt's total when there is one, else the sum of priced items. */
+  paid_cents: number;
+}
+
+export interface PurchaseItem {
+  id: string;
+  product_id: string;
+  name: string;
+  brand: string | null;
+  unit: ProductUnit;
+  status: ItemStatus;
+  quantity_bought: number | null;
+  unit_price_cents: number | null;
+  line_total_cents: number | null;
+}
+
+export interface PurchaseDetail extends PurchaseSummary {
+  items: PurchaseItem[];
+}
+
+export interface ReceiptLine {
+  text: string;
+  quantity: number | null;
+  unit_price_cents: number | null;
+  line_total_cents: number | null;
+  /** Suggested product of the household; null when the line is not a product. */
+  product_id: string | null;
+  previous_price_cents: number | null;
+}
+
+/** A receipt read from a photo, or the demo's sample. Nothing is saved until confirmed. */
+export interface ReceiptDraft {
+  source: ReceiptSource;
+  store_name: string | null;
+  purchased_on: string | null;
+  total_cents: number | null;
+  lines: ReceiptLine[];
+}
+
+export interface ReceiptConfirm {
+  source: ReceiptSource;
+  total_cents: number | null;
+  prices: { product_id: string; unit_price_cents: number }[];
+}
+
+// --- Figures ---------------------------------------------------------------
+
+export interface MonthSpending {
+  /** YYYY-MM */
+  month: string;
+  paid_cents: number;
+  purchases: number;
+}
+
+export interface ConsumptionSummary {
+  days: number;
+  times: number;
+  products: {
+    product_id: string;
+    name: string;
+    unit: ProductUnit;
+    quantity: number;
+    times: number;
+  }[];
+}
+
+export interface PricePoint {
+  purchase_id: string;
+  purchased_at: string;
+  market_name: string | null;
+  unit_price_cents: number;
 }

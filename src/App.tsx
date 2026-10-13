@@ -6,13 +6,14 @@ import { useAuth } from './auth/AuthContext';
 import { AppShell } from './components/AppShell';
 import { AreaPage } from './pages/AreaPage';
 import { DemoPage } from './pages/DemoPage';
+import { HistoryPage } from './pages/HistoryPage';
 import { HomePage } from './pages/HomePage';
+import { JoinPage } from './pages/JoinPage';
 import { ListPage } from './pages/ListPage';
 import { LoginPage } from './pages/LoginPage';
 import { MarketPlanPage } from './pages/MarketPlanPage';
 import { MarketsPage } from './pages/MarketsPage';
 import { ProductsPage } from './pages/ProductsPage';
-import { SoonPage } from './pages/SoonPage';
 import { WelcomePage } from './pages/WelcomePage';
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -36,6 +37,14 @@ export function AppRoutes() {
         element={
           <GuestOnly>
             <LoginPage />
+          </GuestOnly>
+        }
+      />
+      <Route
+        path="/join/:code"
+        element={
+          <GuestOnly>
+            <JoinPage />
           </GuestOnly>
         }
       />
@@ -68,7 +77,7 @@ export function AppRoutes() {
         <Route path="products" element={<ProductsPage />} />
         <Route path="markets" element={<MarketsPage />} />
         <Route path="markets/:marketId" element={<MarketPlanPage />} />
-        <Route path="history" element={<SoonPage titleKey="nav.history" />} />
+        <Route path="history" element={<HistoryPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

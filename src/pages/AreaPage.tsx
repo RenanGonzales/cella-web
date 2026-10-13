@@ -5,9 +5,11 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import { useProducts, useStorageAreas } from '../api/hooks';
 import type { Product } from '../api/types';
 import { useConsumeAction } from '../components/ConsumeProvider';
-import { BigNumber, Icon, SegmentBar } from '../components/ui';
+import { HealthChip, StockMeter, StockRules } from '../components/StockMeter';
+import { BigNumber, Icon } from '../components/ui';
 import { formatQuantity } from '../lib/format';
-import { stockRatio } from '../lib/stats';
+import { overIdeal } from '../lib/health';
+import { stockOf } from '../lib/stats';
 import { palette } from '../theme';
 
 /** Bars with more segments than this are drawn proportionally instead. */
@@ -83,10 +85,11 @@ export function AreaPage() {
 function ProductCard({ product, onUse }: { product: Product; onUse: () => void }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
-  const amount = formatQuantity(product.consume_step, product.unit, locale);
+  const format = (value: number) => formatQuantity(value, product.unit, locale);
+  const amount = format(product.consume_step);
   const steps = Math.round(product.ideal_quantity / product.consume_step);
-  const segmented = steps > 0 && steps <= MAX_SEGMENTS;
-  const filled = Math.round(product.current_quantity / product.consume_step);
+  const stock = stockOf(product);
+  const over = overIdeal(stock);
   const unitLabel = formatQuantity(0, product.unit, locale).replace(/^0\s?/, '');
 
   return (
@@ -105,24 +108,7 @@ function ProductCard({ product, onUse }: { product: Product; onUse: () => void }
           <Box sx={{ fontSize: 17, fontWeight: 500 }}>{product.name}</Box>
           <Box sx={{ fontSize: 13, color: palette.textMuted }}>{product.brand ?? ' '}</Box>
         </Box>
-        {product.needs_restock && (
-          <Box
-            component="span"
-            sx={{
-              alignSelf: 'flex-start',
-              px: 1.25,
-              py: 0.5,
-              borderRadius: 999,
-              bgcolor: palette.frost,
-              color: palette.navy,
-              fontSize: 12,
-              fontWeight: 500,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {t('area.onList')}
-          </Box>
-        )}
+        <HealthChip stock={stock} onList={product.needs_restock} />
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
@@ -134,40 +120,26 @@ function ProductCard({ product, onUse }: { product: Product; onUse: () => void }
           size={52}
         />
         <Box component="span" sx={{ fontSize: 13, color: palette.textSoft }}>
-          {t('area.ofIdeal', {
-            ideal: formatQuantity(product.ideal_quantity, product.unit, locale),
-          })}
+          {over > 0
+            ? t('area.overIdeal', { over: format(over) })
+            : t('area.ofIdeal', { ideal: format(product.ideal_quantity) })}
         </Box>
       </Box>
 
-      {segmented ? (
-        <SegmentBar
-          strong={Math.min(filled, steps)}
-          soft={0}
-          total={steps}
-          height={14}
-          label={`${formatQuantity(product.current_quantity, product.unit, locale)} / ${formatQuantity(product.ideal_quantity, product.unit, locale)}`}
-        />
-      ) : (
-        <Box
-          aria-hidden="true"
-          sx={{ height: 10, borderRadius: 5, bgcolor: palette.track, overflow: 'hidden' }}
-        >
-          <Box
-            sx={{
-              height: 10,
-              width: `${stockRatio(product) * 100}%`,
-              bgcolor: palette.navy,
-              transition: 'width .3s ease',
-            }}
-          />
-        </Box>
-      )}
+      <StockMeter
+        stock={stock}
+        height={14}
+        segments={steps > 0 && steps <= MAX_SEGMENTS ? steps : undefined}
+        label={t('health.aria', {
+          current: format(product.current_quantity),
+          min: format(product.min_quantity),
+          ideal: format(product.ideal_quantity),
+        })}
+        over={over > 0 ? `+${format(over)}` : undefined}
+      />
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-        <Box component="span" sx={{ fontSize: 13, color: palette.textMuted }}>
-          {t('area.min', { value: formatQuantity(product.min_quantity, product.unit, locale) })}
-        </Box>
+        <StockRules stock={stock} format={format} />
         <Button
           variant="contained"
           onClick={onUse}

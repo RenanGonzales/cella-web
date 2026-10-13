@@ -36,6 +36,9 @@ function fakeApi(products: Product[]) {
             added_manually: false,
             assigned_user_id: null,
             last_price_cents: 549,
+            current_quantity: 2,
+            min_quantity: 2,
+            ideal_quantity: 6,
           },
         ],
       },
@@ -66,6 +69,7 @@ function fakeApi(products: Product[]) {
           invite_code: 'DEMO2026',
           members: [{ id: 'alex', name: 'Alex' }],
         },
+        features: { receipt_ai: false, is_demo: true },
       });
     if (url === '/storage-areas') return json([fridge, pantry]);
     if (url === '/products') return json(products);

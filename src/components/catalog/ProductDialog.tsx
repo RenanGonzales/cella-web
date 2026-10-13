@@ -22,6 +22,7 @@ import type { ProductForm, ProductFormErrors } from '../../lib/productForm';
 import { palette } from '../../theme';
 import { Pill } from '../list/ItemDialog';
 import { Sheet } from '../list/Sheet';
+import { PriceHistory } from './PriceHistory';
 
 const UNITS: ProductUnit[] = ['un', 'kg', 'g', 'l', 'ml'];
 
@@ -234,6 +235,8 @@ export function ProductDialog({
         {quantityField('minimum')}
         {quantityField('ideal')}
       </Box>
+
+      {product && <PriceHistory productId={product.id} unit={product.unit} />}
     </Sheet>
   );
 }

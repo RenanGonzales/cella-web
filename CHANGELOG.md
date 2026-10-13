@@ -3,6 +3,46 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/) (0.x while in MVP).
 
+## [0.7.0] - 2026-10-13
+
+Needs cella-api 0.10.0.
+
+### Added
+
+- Receipt after checkout: "Add the receipt" opens a review of each line, matched to a product, with its price and how it moved since last time (↑ 9%). Matches and prices can be fixed; a product on two lines or an invalid price blocks saving. Saved prices become each product's last price.
+  - In the demo the receipt is a sample made from what was bought, labelled "Sample receipt". Accounts with the reader turned on (`features.receipt_ai`) can take a photo instead: it is shrunk to 1568 px in the browser and read by Claude.
+- History screen (replaces "Coming soon"): purchases grouped by month with what was paid and whether there was a receipt; each one opens with its items and prices, and its receipt can be added or reviewed again.
+- Spending card ("Spent in October", against last month's amount, one bar per month) on the home screen and at the top of History.
+- "Used this week" on the home screen: how many times "Use" was tapped and the most used products.
+- Price history (a small line chart) in the product form.
+- Invite: the invite code in the sidebar (and a button in the phone header) opens the invite link to copy; `/join/CODE` creates an account inside that household. Demo copies explain that they cannot be joined.
+- Guided tour: two new steps, "Prices from the receipt" and "Check, then save" (14 steps on phones, 15 on large screens).
+
+### Fixed
+
+- Stock above the ideal no longer reads "32 of 12": the card says "+20 over ideal" and the full bar ends with a "+20" pill.
+
+### Changed
+
+- Tests: 84 in total.
+
+## [0.6.0] - 2026-10-12
+
+Needs cella-api 0.9.0.
+
+### Added
+
+- Stock health in blue tones, the deeper the healthier: Full (at the ideal), Good (above the minimum), Low (at the minimum, on the list), Out. Used on the storage area cards, products, the home screen and the shopping list.
+- Storage area cards say the rules plainly ("Min 6 · Ideal 12", or "Buys when it runs out" when the minimum is zero), with a tick on the bar where the minimum is.
+- Shopping list: each item shows "Has 1 L · min 3 L · ideal 6 L" next to how much to buy; in the store, how much is at home.
+- "Where are you shopping?" when starting: any saved market, or "Somewhere else" (no plan, list by category). "No market" is also an option for sorting the list at home.
+- Floor plan editor: duplicate in any direction (← ↑ ↓ →) and grow or shrink the market on any side with the + and − on each edge; the grid grows on the left or at the top when copies need the room.
+
+### Changed
+
+- The guided tour's "start shopping" step goes through the new market question.
+- Tests: 71 in total.
+
 ## [0.5.0] - 2026-10-12
 
 Needs cella-api 0.8.0 (floor plans).
@@ -79,6 +119,8 @@ Needs cella-api 0.7.0 (one private demo household per visitor).
 - English and Brazilian Portuguese translations.
 - Tests (Vitest + Testing Library), ESLint, Prettier and GitHub Actions CI.
 
+[0.7.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.7.0
+[0.6.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.6.0
 [0.5.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.5.0
 [0.4.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.4.0
 [0.3.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.3.0

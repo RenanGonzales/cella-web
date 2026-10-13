@@ -29,3 +29,8 @@ export function splitMoney(cents: number, locale = 'en', currency = 'USD'): [str
     .join('');
   return [head, tail];
 }
+
+/** Money as one string: 6180 -> "$61.80". */
+export function formatMoney(cents: number, locale = 'en', currency = 'USD'): string {
+  return splitMoney(cents, locale, currency).join('');
+}

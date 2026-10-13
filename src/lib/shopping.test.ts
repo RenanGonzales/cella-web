@@ -19,6 +19,9 @@ function item(overrides: Partial<ShoppingListItem>): ShoppingListItem {
     added_manually: false,
     assigned_user_id: null,
     last_price_cents: null,
+    current_quantity: 0,
+    min_quantity: 1,
+    ideal_quantity: 4,
     ...overrides,
   };
 }

@@ -64,6 +64,7 @@ function fakeApi() {
           name: 'Alex',
           email: 'a@x',
           household: { id: 'h', name: 'Home', invite_code: 'X', members: [] },
+          features: { receipt_ai: false, is_demo: true },
         });
       if (path === '/storage-areas') return json(AREAS);
       if (path === '/shopping-list')
@@ -270,5 +271,34 @@ describe('Markets screen', () => {
     await user.click(within(corner).getByRole('button', { name: 'Use for my list' }));
     expect(within(corner).getByText('Sorting your list')).toBeInTheDocument();
     expect(localStorage.getItem('cella.market')).toBe('m-a');
+  });
+});
+
+describe('Storage area screen', () => {
+  it('shows each product health with its minimum and ideal', async () => {
+    const api = fakeApi();
+    Object.assign(api.products[0]!, {
+      current_quantity: 1,
+      min_quantity: 2,
+      ideal_quantity: 6,
+      needs_restock: true,
+    });
+    Object.assign(api.products[1]!, { current_quantity: 1, min_quantity: 0, ideal_quantity: 1 });
+    renderApp('/areas/fridge');
+
+    expect(await screen.findByText('Low · on the list')).toBeInTheDocument();
+    expect(screen.getByText(/Min 2 · Ideal 6/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: '1 in stock · minimum 2 · ideal 6' }),
+    ).toBeInTheDocument();
+  });
+
+  it('says when an item is only bought once it runs out', async () => {
+    const api = fakeApi();
+    Object.assign(api.products[0]!, { current_quantity: 1, min_quantity: 0, ideal_quantity: 1 });
+    renderApp('/areas/fridge');
+
+    expect(await screen.findByText(/Buys when it runs out · Ideal 1/)).toBeInTheDocument();
+    expect(screen.getByText('Full')).toBeInTheDocument();
   });
 });

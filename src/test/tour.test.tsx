@@ -39,6 +39,7 @@ function fakeApi() {
           name: 'Alex',
           email: 'a@x',
           household: { id: 'h', name: 'Demo House', invite_code: 'X', members: [] },
+          features: { receipt_ai: false, is_demo: true },
         });
       if (path === '/storage-areas') return json([fridge]);
       if (path === '/products') return json([milk]);
@@ -88,7 +89,7 @@ describe('Guided tour', () => {
   it('has the two-phone step only on large screens', () => {
     expect(tourSteps(true).map((step) => step.id)).toContain('two-phones');
     expect(tourSteps(false).map((step) => step.id)).not.toContain('two-phones');
-    expect(tourSteps(false)).toHaveLength(12);
+    expect(tourSteps(false)).toHaveLength(14);
   });
 
   it('walks through the first steps: Next, a tap on the spot, an event from the app', async () => {
@@ -98,7 +99,7 @@ describe('Guided tour', () => {
     renderApp('/');
 
     expect(await caption('Your shopping list')).toBeInTheDocument();
-    expect(screen.getByText('1 of 12')).toBeInTheDocument();
+    expect(screen.getByText('1 of 14')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Next' }));
 
     expect(await caption('Your home, by area')).toBeInTheDocument();
@@ -125,7 +126,7 @@ describe('Guided tour', () => {
 
     await caption('Your shopping list');
     await user.click(screen.getByRole('button', { name: 'Skip tour' }));
-    await waitFor(() => expect(screen.queryByText('1 of 12')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('1 of 14')).not.toBeInTheDocument());
     expect(readTour()).toBeNull();
 
     act(() => startTour());

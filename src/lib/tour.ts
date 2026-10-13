@@ -68,7 +68,7 @@ export function useTourState(): TourState | null {
 }
 
 /** Things the app reports so the tour can move on: "consumed", "started", "split"... */
-export type TourEvent = 'consumed' | 'started' | 'split' | 'checkout';
+export type TourEvent = 'consumed' | 'started' | 'split' | 'checkout' | 'receipt';
 
 export function emitTourEvent(name: TourEvent): void {
   window.dispatchEvent(new CustomEvent(EVENT, { detail: name }));

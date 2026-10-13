@@ -61,7 +61,8 @@
     "useAria": "Usar {{amount}} de {{name}}",
     "ofIdeal": "de {{ideal}}",
     "onList": "Na lista",
-    "min": "mín. {{value}}"
+    "min": "mín. {{value}}",
+    "overIdeal": "+{{over}} acima do ideal"
   },
   "consume": {
     "done": "{{name}} usado · restam {{left}}",
@@ -73,7 +74,6 @@
   "list": {
     "title": "Lista de compras",
     "sortedBy": "Na ordem de",
-    "sortedByCategory": "Por categoria",
     "other": "Outros",
     "add": "Adicionar item",
     "addTitle": "Adicionar à lista",
@@ -90,7 +90,6 @@
     "editAria": "Editar {{name}}",
     "optionsAria": "Opções de {{name}}",
     "ownerAria": "Rota de {{name}}",
-    "noMarket": "Cadastre um mercado para ordenar a lista pelos corredores e começar as compras.",
     "startShopping": "Começar as compras",
     "menu": "Mais opções",
     "split": "Dividir a rota",
@@ -137,11 +136,20 @@
     "finishedElsewhere": "As compras foram finalizadas em outro celular.",
     "estimatedFromLast": "Estimado pelos últimos preços. Coloque os reais depois no Histórico.",
     "switchToPartner": "Ver o celular do Sam",
-    "switchToMain": "Voltar ao celular do Alex"
-  },
-  "soon": {
-    "title": "Em breve",
-    "text": "Esta tela chega na próxima versão."
+    "switchToMain": "Voltar ao celular do Alex",
+    "has": "tem {{value}}",
+    "stockLine": "Tem {{current}} · mín {{min}} · ideal {{ideal}}",
+    "toBuyShort": "comprar",
+    "noMarketOption": "Sem mercado",
+    "manageMarkets": "Mercados",
+    "noMarketTitle": "Compras",
+    "whereTitle": "Onde você vai comprar?",
+    "withPlan": "Com planta · lista na ordem da caminhada",
+    "corridorCount_one": "{{count}} corredor",
+    "corridorCount_other": "{{count}} corredores",
+    "elsewhere": "Outro lugar",
+    "elsewhereHint": "Sem planta: a lista vai por categoria",
+    "startConfirm": "Começar"
   },
   "areas": {
     "Fridge": "Geladeira",
@@ -217,6 +225,14 @@
     "finish": {
       "title": "Tudo pronto",
       "text": "Toque em Finalizar compras e depois em Finalizar. O que está no carrinho entra no estoque; o que faltou vai para a próxima lista."
+    },
+    "receipt": {
+      "title": "Preços do cupom",
+      "text": "Em casa, adicione o cupom: cada linha é ligada a um produto e o preço é salvo. Nesta demo é um cupom de exemplo; numa conta real, a foto é lida pelo Claude."
+    },
+    "receipt-review": {
+      "title": "Confira e salve",
+      "text": "As setas mostram como cada preço mudou desde a última vez. Nada é salvo até você confirmar: toque em Salvar preços."
     },
     "end": {
       "title": "Esse é o Cella",
@@ -320,15 +336,6 @@
       "layout": "Planta",
       "route": "Rota"
     },
-    "size": "Tamanho do mercado",
-    "cols_one": "{{count}} de largura",
-    "cols_other": "{{count}} de largura",
-    "rows_one": "{{count}} de fundo",
-    "rows_other": "{{count}} de fundo",
-    "fewerCols": "Mais estreito",
-    "moreCols": "Mais largo",
-    "fewerRows": "Mais raso",
-    "moreRows": "Mais fundo",
     "zigzag": "Zigue-zague",
     "styles": {
       "column": "Atravessando o corredor do meio",
@@ -384,9 +391,144 @@
     "discard": "Sair",
     "yourRoute": "Sua rota",
     "editLarger": "Edite numa tela maior",
-    "duplicateRight": "Duplicar à direita",
-    "duplicateBelow": "Duplicar abaixo",
     "summary_one": "{{stops}} paradas · {{count}} categoria sem lugar",
-    "summary_other": "{{stops}} paradas · {{count}} categorias sem lugar"
+    "summary_other": "{{stops}} paradas · {{count}} categorias sem lugar",
+    "sizeLabel": "{{cols}} × {{rows}} quadrados · + e − em cada borda mudam o tamanho",
+    "duplicateTo": {
+      "left": "Duplicar à esquerda",
+      "right": "Duplicar à direita",
+      "up": "Duplicar acima",
+      "down": "Duplicar abaixo"
+    },
+    "edges": {
+      "top": {
+        "name": "Borda de cima",
+        "add": "Adicionar fileira em cima",
+        "remove": "Remover fileira de cima"
+      },
+      "bottom": {
+        "name": "Borda de baixo",
+        "add": "Adicionar fileira embaixo",
+        "remove": "Remover fileira de baixo"
+      },
+      "left": {
+        "name": "Borda esquerda",
+        "add": "Adicionar coluna à esquerda",
+        "remove": "Remover coluna da esquerda"
+      },
+      "right": {
+        "name": "Borda direita",
+        "add": "Adicionar coluna à direita",
+        "remove": "Remover coluna da direita"
+      }
+    }
+  },
+  "health": {
+    "full": "Cheio",
+    "good": "Bom",
+    "low": "Baixo",
+    "out": "Acabou",
+    "onList": "na lista",
+    "min": "Mín {{value}}",
+    "minZero": "Compra quando acabar",
+    "ideal": "Ideal {{value}}",
+    "aria": "{{current}} em estoque · mínimo {{min}} · ideal {{ideal}}"
+  },
+  "receipt": {
+    "add": "Adicionar o cupom",
+    "again": "Revisar o cupom",
+    "title": "Preços do cupom",
+    "intro": "Tire uma foto do cupom: o Claude lê cada linha e liga aos seus produtos. Você confere tudo antes de salvar.",
+    "privacy": "A foto não é guardada, só os preços que você confirmar.",
+    "photo": "Tirar foto",
+    "useSample": "Usar um cupom de exemplo",
+    "reading": "Lendo o cupom…",
+    "readError": "Não deu para ler este cupom. Tente outra foto ou use o exemplo.",
+    "reviewTitle": "Confira o cupom",
+    "sampleBadge": "Cupom de exemplo",
+    "sampleHint": "Na demo, o cupom é um exemplo feito com o que você comprou. Cada linha está ligada a um produto; as setas mostram como o preço mudou desde a última vez.",
+    "reviewHint": "Cada linha foi ligada a um produto. Corrija o que precisar e salve.",
+    "lines": "Linhas do cupom",
+    "productOf": "Produto de {{line}}",
+    "priceOf": "Preço de {{line}}",
+    "notAProduct": "Não é produto",
+    "previous": "Da última vez {{price}}",
+    "same": "Mesmo preço",
+    "up": "↑ {{percent}}%",
+    "down": "↓ {{percent}}%",
+    "total": "Total do cupom",
+    "linesDiffer": "As linhas somam {{lines}}.",
+    "missing_one": "{{names}} não tem linha e fica com o último preço.",
+    "missing_other": "{{count}} produtos não têm linha e ficam com o último preço: {{names}}.",
+    "repeated": "{{names}} está em mais de uma linha: escolha uma.",
+    "invalid": "Alguns preços não são números válidos.",
+    "saveError": "Não deu para salvar. Confira a conexão e tente de novo.",
+    "updatesPrices": "Os preços salvos viram o último preço de cada produto, e a próxima lista é estimada com eles.",
+    "cancel": "Cancelar",
+    "save": "Salvar preços",
+    "savedNote": "Pago, pelo cupom. Preços atualizados."
+  },
+  "spending": {
+    "spentIn": "Gasto em {{month}}",
+    "trips_one": "{{count}} ida ao mercado",
+    "trips_other": "{{count}} idas ao mercado",
+    "chart": "Gasto por mês: {{months}}",
+    "vs": "contra {{amount}} em {{month}}"
+  },
+  "used": {
+    "title": "Usado esta semana",
+    "taps_one": "uso",
+    "taps_other": "usos",
+    "none": "Nada usado nos últimos 7 dias.",
+    "units_one": "unidade",
+    "units_other": "unidades"
+  },
+  "history": {
+    "title": "Histórico",
+    "summary_one": "{{count}} compra",
+    "summary_other": "{{count}} compras",
+    "empty": "Nenhuma compra ainda. Elas aparecem aqui depois de cada finalização.",
+    "open": "Compra de {{date}} em {{market}}",
+    "noMarket": "Outro lugar",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} itens",
+    "withReceipt": "cupom",
+    "close": "Fechar",
+    "noPrice": "Sem preço",
+    "paid": "Pago",
+    "total": "Total dos itens com preço",
+    "source": {
+      "sample": "Preços do cupom de exemplo.",
+      "ai": "Preços lidos da foto do cupom.",
+      "manual": "Preços digitados à mão."
+    }
+  },
+  "invite": {
+    "open": "Convidar alguém",
+    "title": "Convidar para {{household}}",
+    "text": "Quem abrir o link cria uma conta e passa a dividir esta casa: o estoque, a lista e a rota de compras.",
+    "demo": "Esta é uma cópia de demonstração apagada depois de 24 horas, então ninguém pode entrar nela. Numa casa de verdade, este link adiciona uma pessoa à sua casa.",
+    "copy": "Copiar link",
+    "copied": "Link copiado",
+    "done": "Pronto"
+  },
+  "join": {
+    "title": "Entrar numa casa",
+    "text": "Você foi convidado para dividir uma casa no Cella. Crie sua conta para começar.",
+    "name": "Seu nome",
+    "code": "Código de convite",
+    "submit": "Criar conta e entrar",
+    "passwordHint": "Pelo menos {{count}} caracteres",
+    "passwordShort": "A senha precisa de pelo menos {{count}} caracteres.",
+    "codeNotFound": "Este código de convite não existe. Confira com quem te convidou.",
+    "emailTaken": "Já existe uma conta com este e-mail.",
+    "invalid": "Confira os campos e tente de novo.",
+    "haveAccount": "Já tenho conta"
+  },
+  "prices": {
+    "title": "Histórico de preço",
+    "up": "subiu {{percent}}% em {{count}} compras",
+    "down": "caiu {{percent}}% em {{count}} compras",
+    "chart": "De {{from}} para {{to}} em {{count}} compras"
   }
 }

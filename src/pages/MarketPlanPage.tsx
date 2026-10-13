@@ -22,22 +22,23 @@ import { Sheet } from '../components/list/Sheet';
 import { PlanCanvas } from '../components/plan/PlanCanvas';
 import type { CanvasHandlers } from '../components/plan/PlanCanvas';
 import { Icon } from '../components/ui';
+import type { IconName } from '../components/ui';
 import {
   LIMITS,
   autoRoute,
   drawRoute,
   duplicate,
-  extent,
   freeSpot,
   isStop,
   layoutBody,
   newKey,
   planFromLayout,
+  resizeSide,
   routeOf,
   transform,
   uniqueName,
 } from '../lib/plan';
-import type { Layout, Piece, PieceKind, Plan } from '../lib/plan';
+import type { Direction, Layout, Piece, PieceKind, Plan, Side } from '../lib/plan';
 import { glow, palette, theme } from '../theme';
 
 /** Size of a new piece of each kind, in cells. */
@@ -51,6 +52,15 @@ const PALETTE: { id: string; kind: PieceKind; w: number; h: number }[] = [
 ];
 
 const MAX_CELL = 40;
+/** Room around the grid for the + and − of each edge. */
+const EDGE = 40;
+
+const DIRECTIONS: [Direction, IconName][] = [
+  ['left', 'arrowLeft'],
+  ['up', 'arrowUp'],
+  ['down', 'arrowDown'],
+  ['right', 'arrowRight'],
+];
 const MIN_CELL = 18;
 
 /** The floor plan of one market: an editor on large screens, the route on phones. */
@@ -137,7 +147,7 @@ function PlanEditor({
 
   const stops = routeOf(plan);
   const stopNumbers = new Map(stops.map((stop, index) => [stop.key, index + 1]));
-  const cell = cellFor(width, plan.cols);
+  const cell = cellFor(width - EDGE * 2, plan.cols);
   const drawing = drawRoute(plan, stops, cell);
   const placedCategories = new Set(plan.pieces.flatMap((piece) => piece.categoryIds));
   const unplaced = [...categories].filter(([id]) => !placedCategories.has(id));
@@ -148,7 +158,6 @@ function PlanEditor({
     plan.pieces.filter((piece) => piece.kind === 'aisle').map((piece) => `${piece.y}:${piece.h}`),
   );
   const single = selected.length === 1 ? plan.pieces.find((p) => p.key === selected[0]) : undefined;
-  const limits = extent(plan.pieces);
 
   // Closing the tab with unsaved changes asks first.
   useEffect(() => {
@@ -213,7 +222,7 @@ function PlanEditor({
     onClear: () => setSelected([]),
   };
 
-  function copy(direction: 'right' | 'below') {
+  function copy(direction: Direction) {
     const result = duplicate(plan, selected, direction);
     if (!result) return setMessage(t('plan.noRoom'));
     update(result.pieces, { cols: result.cols, rows: result.rows });
@@ -370,38 +379,8 @@ function PlanEditor({
             }}
           >
             <Box sx={{ fontWeight: 500 }}>{t('plan.title')}</Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-              <Box sx={{ fontSize: 13, color: palette.textMuted }}>{t('plan.size')}</Box>
-              <Stepper
-                label={t('plan.cols', { count: plan.cols })}
-                less={t('plan.fewerCols')}
-                more={t('plan.moreCols')}
-                onLess={
-                  plan.cols > limits.cols
-                    ? () => setPlan({ ...plan, cols: plan.cols - 1 })
-                    : undefined
-                }
-                onMore={
-                  plan.cols < LIMITS.maxCols
-                    ? () => setPlan({ ...plan, cols: plan.cols + 1 })
-                    : undefined
-                }
-              />
-              <Stepper
-                label={t('plan.rows', { count: plan.rows })}
-                less={t('plan.fewerRows')}
-                more={t('plan.moreRows')}
-                onLess={
-                  plan.rows > limits.rows
-                    ? () => setPlan({ ...plan, rows: plan.rows - 1 })
-                    : undefined
-                }
-                onMore={
-                  plan.rows < LIMITS.maxRows
-                    ? () => setPlan({ ...plan, rows: plan.rows + 1 })
-                    : undefined
-                }
-              />
+            <Box sx={{ fontSize: 13, color: palette.textMuted }}>
+              {t('plan.sizeLabel', { cols: plan.cols, rows: plan.rows })}
             </Box>
           </Box>
 
@@ -444,8 +423,22 @@ function PlanEditor({
                 <Box sx={{ fontSize: 14, mr: 1 }}>
                   {t('plan.selected', { count: selected.length })}
                 </Box>
-                <DarkButton onClick={() => copy('right')}>{t('plan.duplicateRight')}</DarkButton>
-                <DarkButton onClick={() => copy('below')}>{t('plan.duplicateBelow')}</DarkButton>
+                <Box sx={{ fontSize: 13, opacity: 0.8, ml: 0.5 }}>{t('plan.duplicate')}</Box>
+                {DIRECTIONS.map(([direction, icon]) => (
+                  <IconButton
+                    key={direction}
+                    aria-label={t(`plan.duplicateTo.${direction}`)}
+                    onClick={() => copy(direction)}
+                    sx={{
+                      color: '#FFFFFF',
+                      bgcolor: 'rgba(255,255,255,0.16)',
+                      width: 36,
+                      height: 36,
+                    }}
+                  >
+                    <Icon name={icon} size={16} />
+                  </IconButton>
+                ))}
                 <DarkButton onClick={handlers.onDelete}>{t('plan.delete')}</DarkButton>
                 <IconButton
                   aria-label={t('plan.clear')}
@@ -463,15 +456,24 @@ function PlanEditor({
           </Box>
 
           <Box ref={boxRef} sx={{ overflowX: 'auto' }}>
-            <PlanCanvas
+            <EdgeFrame
               plan={plan}
-              cell={cell}
-              selected={mode === 'layout' ? selected : []}
-              drawing={drawing}
-              stopNumbers={stopNumbers}
-              dimOthers={mode === 'route'}
-              handlers={handlers}
-            />
+              active={mode === 'layout'}
+              onResize={(side, delta) => {
+                const next = resizeSide(plan, side, delta);
+                if (next) setPlan(next);
+              }}
+            >
+              <PlanCanvas
+                plan={plan}
+                cell={cell}
+                selected={mode === 'layout' ? selected : []}
+                drawing={drawing}
+                stopNumbers={stopNumbers}
+                dimOthers={mode === 'route'}
+                handlers={handlers}
+              />
+            </EdgeFrame>
           </Box>
 
           {mode === 'layout' && (
@@ -880,48 +882,6 @@ function Panel({ title, text, children }: { title: string; text: string; childre
   );
 }
 
-function Stepper({
-  label,
-  less,
-  more,
-  onLess,
-  onMore,
-}: {
-  label: string;
-  less: string;
-  more: string;
-  onLess?: () => void;
-  onMore?: () => void;
-}) {
-  const button = {
-    width: 32,
-    height: 32,
-    bgcolor: palette.surface,
-    color: palette.navy,
-    fontSize: 18,
-  };
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.5,
-        p: 0.5,
-        borderRadius: 999,
-        bgcolor: palette.canvas,
-      }}
-    >
-      <IconButton aria-label={less} onClick={onLess} disabled={!onLess} sx={button}>
-        −
-      </IconButton>
-      <Box sx={{ minWidth: 72, textAlign: 'center', fontSize: 14 }}>{label}</Box>
-      <IconButton aria-label={more} onClick={onMore} disabled={!onMore} sx={button}>
-        +
-      </IconButton>
-    </Box>
-  );
-}
-
 function DarkButton({ onClick, children }: { onClick: () => void; children: ReactNode }) {
   return (
     <ButtonBase
@@ -981,5 +941,65 @@ function Swatch({ kind, w, h }: { kind: PieceKind; w: number; h: number }) {
         bgcolor: colors[kind],
       }}
     />
+  );
+}
+
+/** The grid with a + and − on each edge: grow or shrink the market on that side. */
+function EdgeFrame({
+  plan,
+  active,
+  onResize,
+  children,
+}: {
+  plan: Plan;
+  active: boolean;
+  onResize: (side: Side, delta: 1 | -1) => void;
+  children: ReactNode;
+}) {
+  const { t } = useTranslation();
+  const place: Record<Side, object> = {
+    top: { top: 4, left: '50%', transform: 'translateX(-50%)', flexDirection: 'row' },
+    bottom: { bottom: 4, left: '50%', transform: 'translateX(-50%)', flexDirection: 'row' },
+    left: { left: 4, top: '50%', transform: 'translateY(-50%)', flexDirection: 'column' },
+    right: { right: 4, top: '50%', transform: 'translateY(-50%)', flexDirection: 'column' },
+  };
+  const button = {
+    width: 30,
+    height: 30,
+    bgcolor: palette.canvas,
+    color: palette.navy,
+    fontSize: 18,
+    '&:hover': { bgcolor: palette.frost },
+  };
+  return (
+    <Box sx={{ position: 'relative', p: `${EDGE}px`, width: 'fit-content', mx: 'auto' }}>
+      {children}
+      {active &&
+        (['top', 'bottom', 'left', 'right'] as const).map((side) => (
+          <Box
+            key={side}
+            role="group"
+            aria-label={t(`plan.edges.${side}.name`)}
+            sx={{ position: 'absolute', display: 'flex', gap: 0.5, ...place[side] }}
+          >
+            <IconButton
+              aria-label={t(`plan.edges.${side}.remove`)}
+              disabled={resizeSide(plan, side, -1) === null}
+              onClick={() => onResize(side, -1)}
+              sx={button}
+            >
+              −
+            </IconButton>
+            <IconButton
+              aria-label={t(`plan.edges.${side}.add`)}
+              disabled={resizeSide(plan, side, 1) === null}
+              onClick={() => onResize(side, 1)}
+              sx={button}
+            >
+              +
+            </IconButton>
+          </Box>
+        ))}
+    </Box>
   );
 }

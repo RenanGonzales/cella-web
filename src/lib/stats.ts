@@ -1,10 +1,22 @@
 import type { Product, ShoppingList } from '../api/types';
+import type { Stock } from './health';
 
 export interface AreaStats {
   count: number;
   low: number;
   /** Average of how full each product is, relative to its ideal (0-100). */
   percent: number;
+}
+
+/** The product's stock in the shape the health helpers use. */
+export function stockOf(
+  product: Pick<Product, 'current_quantity' | 'min_quantity' | 'ideal_quantity'>,
+): Stock {
+  return {
+    current: product.current_quantity,
+    min: product.min_quantity,
+    ideal: product.ideal_quantity,
+  };
 }
 
 export function stockRatio(product: Product): number {

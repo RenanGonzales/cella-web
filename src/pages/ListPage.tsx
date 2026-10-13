@@ -1,4 +1,13 @@
-import { Box, Button, IconButton, Menu, MenuItem, Skeleton, Snackbar } from '@mui/material';
+import {
+  Box,
+  Button,
+  ButtonBase,
+  IconButton,
+  Menu,
+  MenuItem,
+  Skeleton,
+  Snackbar,
+} from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +32,7 @@ import type {
   ItemChanges,
   Market,
   Member,
+  PurchaseDetail,
   ShoppingList,
   ShoppingListItem,
 } from '../api/types';
@@ -30,13 +40,22 @@ import { useFocusMode } from '../components/FocusMode';
 import { AddItemDialog } from '../components/list/AddItemDialog';
 import { BottomAction } from '../components/list/BottomAction';
 import { CheckoutDialog } from '../components/list/CheckoutDialog';
+import { ReceiptDialog } from '../components/receipt/ReceiptDialog';
 import { Pill, PlanItemDialog, StoreItemDialog } from '../components/list/ItemDialog';
 import { PlanRow, StoreRow } from '../components/list/ItemRow';
 import { Sheet } from '../components/list/Sheet';
 import { SplitDialog } from '../components/list/SplitDialog';
 import { BigNumber, Card, Icon, Money, SegmentBar } from '../components/ui';
 import { splitMoney } from '../lib/format';
-import { MARKET_KEY, cartStats, isSplit, listItems, listSections, stepOf } from '../lib/shopping';
+import {
+  MARKET_KEY,
+  NO_MARKET,
+  cartStats,
+  isSplit,
+  listItems,
+  listSections,
+  stepOf,
+} from '../lib/shopping';
 import type { CartStats, ListSection } from '../lib/shopping';
 import { listStats } from '../lib/stats';
 import { useStoredString } from '../lib/storage';
@@ -56,7 +75,11 @@ export function ListPage() {
   const { data: me } = useMe();
   const { data: markets = [] } = useMarkets();
   const [storedMarket, setStoredMarket] = useStoredString(MARKET_KEY);
-  const sortMarket = markets.find((market) => market.id === storedMarket) ?? markets[0] ?? null;
+  // "none": the household chose to shop without a market (list by category).
+  const sortMarket =
+    storedMarket === NO_MARKET
+      ? null
+      : (markets.find((market) => market.id === storedMarket) ?? markets[0] ?? null);
   const { data: list, isLoading } = useShoppingList(sortMarket?.id ?? null);
 
   const shopping = list?.status === 'shopping';
@@ -64,9 +87,9 @@ export function ListPage() {
 
   // Someone else may have started shopping at another market: follow their sorting.
   useEffect(() => {
-    if (shopping && list.market_id && list.market_id !== sortMarket?.id) {
-      setStoredMarket(list.market_id);
-    }
+    if (!shopping) return;
+    if (list.market_id && list.market_id !== sortMarket?.id) setStoredMarket(list.market_id);
+    if (!list.market_id && sortMarket?.id) setStoredMarket(NO_MARKET);
   }, [shopping, list?.market_id, sortMarket?.id, setStoredMarket]);
 
   const [message, setMessage] = useState<string | null>(null);
@@ -92,6 +115,8 @@ export function ListPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutResult, setCheckoutResult] = useState<CheckoutResponse | null>(null);
   const [cartAtCheckout, setCartAtCheckout] = useState<CartStats | null>(null);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [receipt, setReceipt] = useState<PurchaseDetail | null>(null);
   const items = listItems(list);
 
   const finish = () => {
@@ -128,7 +153,7 @@ export function ListPage() {
       ) : shopping ? (
         <StoreView
           list={list}
-          market={markets.find((market) => market.id === list.market_id) ?? sortMarket}
+          market={markets.find((market) => market.id === list.market_id) ?? null}
           meId={me?.id ?? null}
           members={members}
           onError={notify}
@@ -147,7 +172,19 @@ export function ListPage() {
         />
       )}
 
-      {checkoutOpen && (
+      {checkoutOpen && receiptOpen && checkoutResult && (
+        <ReceiptDialog
+          purchaseId={checkoutResult.purchase_id}
+          canRead={me?.features.receipt_ai ?? false}
+          onClose={() => setReceiptOpen(false)}
+          onSaved={(detail) => {
+            setReceipt(detail);
+            setReceiptOpen(false);
+            emitTourEvent('receipt');
+          }}
+        />
+      )}
+      {checkoutOpen && !receiptOpen && (
         <CheckoutDialog
           stats={cartAtCheckout ?? cartStats(items)}
           result={checkoutResult}
@@ -158,8 +195,11 @@ export function ListPage() {
             setCheckoutOpen(false);
             setCheckoutResult(null);
             setCartAtCheckout(null);
+            setReceipt(null);
             navigate('/');
           }}
+          onReceipt={() => setReceiptOpen(true)}
+          receipt={receipt}
         />
       )}
 
@@ -198,6 +238,7 @@ function PlanView({
   const updateItem = useUpdateItem();
   const removeItem = useRemoveItem();
   const start = useStartShopping();
+  const [choosing, setChoosing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
 
@@ -240,34 +281,32 @@ function PlanView({
             color: palette.textMuted,
           }}
         >
-          {sortMarket ? t('list.sortedBy') : t('list.sortedByCategory')}
-          {markets.length > 1 ? (
-            <Box
-              role="radiogroup"
-              aria-label={t('list.sortedBy')}
-              sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}
-            >
-              {markets.map((market) => (
-                <Pill
-                  key={market.id}
-                  selected={market.id === sortMarket?.id}
-                  onClick={() => onSortBy(market.id)}
-                >
-                  {market.name}
-                </Pill>
-              ))}
-            </Box>
-          ) : (
-            sortMarket && (
-              <Box
-                component={RouterLink}
-                to="/markets"
-                sx={{ color: palette.navy, fontWeight: 500, textUnderlineOffset: 3 }}
+          {t('list.sortedBy')}
+          <Box
+            role="radiogroup"
+            aria-label={t('list.sortedBy')}
+            sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}
+          >
+            {markets.map((market) => (
+              <Pill
+                key={market.id}
+                selected={market.id === sortMarket?.id}
+                onClick={() => onSortBy(market.id)}
               >
-                {sortMarket.name}
-              </Box>
-            )
-          )}
+                {market.name}
+              </Pill>
+            ))}
+            <Pill selected={!sortMarket} onClick={() => onSortBy(NO_MARKET)}>
+              {t('list.noMarketOption')}
+            </Pill>
+          </Box>
+          <Box
+            component={RouterLink}
+            to="/markets"
+            sx={{ fontSize: 13, color: palette.navyMid, textUnderlineOffset: 3, ml: 'auto' }}
+          >
+            {t('list.manageMarkets')}
+          </Box>
         </Box>
       </Card>
 
@@ -289,18 +328,33 @@ function PlanView({
         {t('list.add')}
       </Button>
 
-      {!sortMarket && items.length > 0 && (
-        <Box sx={{ fontSize: 13, color: palette.textMuted, px: 1 }}>{t('list.noMarket')}</Box>
-      )}
-
       {items.length > 0 && (
         <BottomAction
           tourId="start-shopping"
           label={t('list.startShopping')}
-          disabled={!sortMarket || start.isPending}
-          onClick={() => {
-            if (!sortMarket) return;
-            start.mutate(sortMarket.id, { onError, onSuccess: () => emitTourEvent('started') });
+          disabled={start.isPending}
+          onClick={() => setChoosing(true)}
+        />
+      )}
+
+      {choosing && (
+        <StartSheet
+          markets={markets}
+          initial={sortMarket?.id ?? NO_MARKET}
+          busy={start.isPending}
+          onClose={() => setChoosing(false)}
+          onStart={(choice) => {
+            onSortBy(choice);
+            start.mutate(choice === NO_MARKET ? null : choice, {
+              onError: (error) => {
+                setChoosing(false);
+                onError(error);
+              },
+              onSuccess: () => {
+                setChoosing(false);
+                emitTourEvent('started');
+              },
+            });
           }}
         />
       )}
@@ -430,7 +484,7 @@ function StoreView({
           component="h1"
           sx={{ m: 0, textAlign: 'center', fontSize: 16, fontWeight: 500, color: palette.navy }}
         >
-          {market?.name ?? t('list.title')}
+          {market?.name ?? t('list.noMarketTitle')}
         </Box>
         <IconButton
           aria-label={t('list.menu')}
@@ -706,5 +760,99 @@ function Sections({
         </Box>
       ))}
     </Box>
+  );
+}
+
+/** "Where are you shopping?": the household's markets, or somewhere without a plan. */
+function StartSheet({
+  markets,
+  initial,
+  busy,
+  onClose,
+  onStart,
+}: {
+  markets: Market[];
+  initial: string;
+  busy: boolean;
+  onClose: () => void;
+  onStart: (marketId: string) => void;
+}) {
+  const { t } = useTranslation();
+  const [choice, setChoice] = useState(initial);
+  const options = [
+    ...markets.map((market) => ({
+      id: market.id,
+      name: market.name,
+      hint: market.has_plan
+        ? t('list.withPlan')
+        : t('list.corridorCount', { count: market.corridor_count }),
+    })),
+    { id: NO_MARKET, name: t('list.elsewhere'), hint: t('list.elsewhereHint') },
+  ];
+  return (
+    <Sheet
+      open
+      onClose={onClose}
+      title={t('list.whereTitle')}
+      actions={
+        <>
+          <Button onClick={onClose} sx={{ color: 'text.secondary' }}>
+            {t('list.close')}
+          </Button>
+          <Button
+            variant="contained"
+            disabled={busy}
+            onClick={() => onStart(choice)}
+            data-tour="start-confirm"
+          >
+            {t('list.startConfirm')}
+          </Button>
+        </>
+      }
+    >
+      <Box
+        role="radiogroup"
+        aria-label={t('list.whereTitle')}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+      >
+        {options.map((option) => {
+          const selected = option.id === choice;
+          return (
+            <ButtonBase
+              key={option.id}
+              role="radio"
+              aria-checked={selected}
+              onClick={() => setChoice(option.id)}
+              sx={{
+                justifyContent: 'flex-start',
+                textAlign: 'left',
+                gap: 1.5,
+                p: 1.75,
+                borderRadius: '18px',
+                bgcolor: selected ? palette.frost : palette.canvas,
+                outline: selected ? `2px solid ${palette.navy}` : 'none',
+              }}
+            >
+              <Box
+                aria-hidden="true"
+                sx={{
+                  width: 20,
+                  height: 20,
+                  flexShrink: 0,
+                  borderRadius: '50%',
+                  border: `2px solid ${palette.navy}`,
+                  bgcolor: selected ? palette.navy : 'transparent',
+                  boxShadow: selected ? 'inset 0 0 0 3px #FFFFFF' : 'none',
+                }}
+              />
+              <Box>
+                <Box sx={{ fontSize: 15, fontWeight: 500 }}>{option.name}</Box>
+                <Box sx={{ fontSize: 12, color: palette.textMuted }}>{option.hint}</Box>
+              </Box>
+            </ButtonBase>
+          );
+        })}
+      </Box>
+    </Sheet>
   );
 }

@@ -7,12 +7,19 @@ import type {
   Category,
   CheckoutResponse,
   ConsumeResponse,
+  ConsumptionSummary,
   ItemChanges,
   Market,
   MarketInput,
   Me,
+  MonthSpending,
+  PricePoint,
   Product,
   ProductInput,
+  PurchaseDetail,
+  PurchaseSummary,
+  ReceiptConfirm,
+  ReceiptDraft,
   ShoppingList,
   ShoppingListItem,
   StorageArea,
@@ -31,6 +38,11 @@ export const keys = {
   categories: ['categories'] as const,
   layout: (marketId: string) => ['markets', marketId, 'layout'] as const,
   archivedProducts: ['products', 'archived'] as const,
+  purchases: ['purchases'] as const,
+  purchase: (id: string) => ['purchases', id] as const,
+  spending: (months: number) => ['stats', 'spending', months] as const,
+  consumption: (days: number) => ['stats', 'consumption', days] as const,
+  prices: (productId: string) => ['products', productId, 'prices'] as const,
 };
 
 /** The shared list changes when someone else consumes: refresh it every few seconds. */
@@ -194,7 +206,7 @@ function useListAction<T>(request: (input: T) => Promise<unknown>) {
 }
 
 export function useStartShopping() {
-  return useListAction((marketId: string) =>
+  return useListAction((marketId: string | null) =>
     api<ShoppingList>('/shopping-list/start', { method: 'POST', body: { market_id: marketId } }),
   );
 }
@@ -218,7 +230,89 @@ export function useCheckout() {
       Promise.all([
         client.invalidateQueries({ queryKey: keys.list }),
         client.invalidateQueries({ queryKey: keys.products }),
+        client.invalidateQueries({ queryKey: keys.purchases }),
+        client.invalidateQueries({ queryKey: ['stats'] }),
       ]),
+  });
+}
+
+// --- Purchases, receipts and figures ----------------------------------------
+
+/** The browser's time zone decides which month a purchase belongs to. */
+function timeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+}
+
+export function usePurchases(limit = 100) {
+  return useQuery({
+    queryKey: keys.purchases,
+    queryFn: () => api<PurchaseSummary[]>(`/purchases?limit=${limit}`),
+  });
+}
+
+export function usePurchase(id: string | null) {
+  return useQuery({
+    queryKey: keys.purchase(id ?? ''),
+    queryFn: () => api<PurchaseDetail>(`/purchases/${id}`),
+    enabled: id !== null,
+  });
+}
+
+export function useSpending(months = 6) {
+  return useQuery({
+    queryKey: keys.spending(months),
+    queryFn: () =>
+      api<MonthSpending[]>(`/stats/spending?months=${months}&tz=${encodeURIComponent(timeZone())}`),
+  });
+}
+
+export function useConsumption(days = 7) {
+  return useQuery({
+    queryKey: keys.consumption(days),
+    queryFn: () => api<ConsumptionSummary>(`/stats/consumption?days=${days}`),
+  });
+}
+
+export function usePrices(productId: string | null) {
+  return useQuery({
+    queryKey: keys.prices(productId ?? ''),
+    queryFn: () => api<PricePoint[]>(`/products/${productId}/prices`),
+    enabled: productId !== null,
+  });
+}
+
+/** The demo's sample receipt (or a photo read by Claude): a draft, nothing is saved. */
+export function useReceiptDraft(purchaseId: string) {
+  return useMutation({
+    mutationFn: (photo?: { media_type: string; data: string }) =>
+      photo
+        ? api<ReceiptDraft>(`/purchases/${purchaseId}/receipt/read`, {
+            method: 'POST',
+            body: photo,
+          })
+        : api<ReceiptDraft>(`/purchases/${purchaseId}/receipt/sample`),
+  });
+}
+
+/** Save the reviewed receipt: prices become each product's last price. */
+export function useSaveReceipt(purchaseId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ReceiptConfirm) =>
+      api<PurchaseDetail>(`/purchases/${purchaseId}/receipt`, { method: 'PUT', body }),
+    onSuccess: (detail) => {
+      client.setQueryData(keys.purchase(purchaseId), detail);
+      return Promise.all([
+        client.invalidateQueries({ queryKey: keys.purchases }),
+        client.invalidateQueries({ queryKey: ['stats'] }),
+        client.invalidateQueries({ queryKey: keys.products }),
+        client.invalidateQueries({ queryKey: keys.list }),
+      ]);
+    },
   });
 }
 

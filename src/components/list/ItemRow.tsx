@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import type { Member, ShoppingListItem } from '../../api/types';
 import { formatQuantity } from '../../lib/format';
+import { HEALTH_TONES, healthOf } from '../../lib/health';
 import { unitPrice } from '../../lib/shopping';
+import { stockOf } from '../../lib/stats';
 import { palette } from '../../theme';
 
 function meta(item: ShoppingListItem, locale: string): string {
@@ -30,14 +32,20 @@ export function PlanRow({ item, onOpen }: { item: ShoppingListItem; onOpen: () =
         borderRadius: '14px',
       }}
     >
-      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.25 }}>
         <Name>{item.name}</Name>
         <Box component="span" sx={{ fontSize: 12, color: palette.textFaint }}>
           {meta(item, locale) || ' '}
         </Box>
+        <StockLine item={item} locale={locale} />
       </Box>
-      <Box component="span" sx={{ fontSize: 15 }}>
-        {formatQuantity(item.quantity_needed, item.unit, locale)}
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+        <Box component="span" sx={{ fontSize: 15 }}>
+          {formatQuantity(item.quantity_needed, item.unit, locale)}
+        </Box>
+        <Box component="span" sx={{ fontSize: 11, color: palette.textFaint }}>
+          {t('list.toBuyShort')}
+        </Box>
       </Box>
     </ButtonBase>
   );
@@ -123,7 +131,16 @@ export function StoreRow({
             component="span"
             sx={{ fontSize: 12, color: missing ? palette.navyMid : palette.textFaint }}
           >
-            {missing ? t('list.notFoundMeta') : meta(item, locale) || ' '}
+            {missing
+              ? t('list.notFoundMeta')
+              : [
+                  meta(item, locale),
+                  t('list.has', {
+                    value: formatQuantity(item.current_quantity, item.unit, locale),
+                  }),
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
           </Box>
         </Box>
       </ButtonBase>
@@ -185,6 +202,36 @@ function Name({ children, done = false }: { children: string; done?: boolean }) 
       }}
     >
       {children}
+    </Box>
+  );
+}
+
+/** "Has 1 L · min 3 L · ideal 6 L", with a dot in the health tone. */
+function StockLine({ item, locale }: { item: ShoppingListItem; locale: string }) {
+  const { t } = useTranslation();
+  const format = (value: number) => formatQuantity(value, item.unit, locale);
+  const tone = HEALTH_TONES[healthOf(stockOf(item))];
+  return (
+    <Box
+      component="span"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.75,
+        fontSize: 12,
+        color: palette.textMuted,
+      }}
+    >
+      <Box
+        component="span"
+        aria-hidden="true"
+        sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: tone.fill, flexShrink: 0 }}
+      />
+      {t('list.stockLine', {
+        current: format(item.current_quantity),
+        min: format(item.min_quantity),
+        ideal: format(item.ideal_quantity),
+      })}
     </Box>
   );
 }

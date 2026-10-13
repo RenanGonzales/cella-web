@@ -1,11 +1,11 @@
 import { Box, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-import type { CheckoutResponse } from '../../api/types';
+import type { CheckoutResponse, PurchaseDetail } from '../../api/types';
 import { splitMoney } from '../../lib/format';
 import type { CartStats } from '../../lib/shopping';
 import { palette } from '../../theme';
-import { BigNumber, Money } from '../ui';
+import { BigNumber, Icon, Money } from '../ui';
 import { Sheet } from './Sheet';
 
 /** Confirm the end of the purchase, then show what happened to stock and the list. */
@@ -16,6 +16,8 @@ export function CheckoutDialog({
   onClose,
   onConfirm,
   onDone,
+  onReceipt,
+  receipt = null,
 }: {
   /** The cart when "Finish" was tapped (the list itself changes right after). */
   stats: CartStats;
@@ -24,6 +26,10 @@ export function CheckoutDialog({
   onClose: () => void;
   onConfirm: () => void;
   onDone: () => void;
+  /** Opens the receipt review for this purchase. */
+  onReceipt?: () => void;
+  /** The purchase once its receipt is saved: the total comes from it. */
+  receipt?: PurchaseDetail | null;
 }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
@@ -40,7 +46,14 @@ export function CheckoutDialog({
           </Button>
         }
       >
-        {result.items_without_price === 0 ? (
+        {receipt ? (
+          <Box>
+            <BigNumber value={<Money parts={splitMoney(receipt.paid_cents, locale)} />} size={56} />
+            <Box sx={{ mt: 1, fontSize: 13, color: palette.textMuted }}>
+              {t('receipt.savedNote')}
+            </Box>
+          </Box>
+        ) : result.items_without_price === 0 ? (
           <BigNumber value={<Money parts={splitMoney(result.total_cents, locale)} />} size={56} />
         ) : (
           // Prices of this purchase come later; meanwhile, estimate from the last ones.
@@ -64,6 +77,17 @@ export function CheckoutDialog({
             <li>{t('list.carried', { count: result.items_carried_over })}</li>
           )}
         </Box>
+        {onReceipt && !receipt && result.items_bought > 0 && (
+          <Button
+            variant="outlined"
+            onClick={onReceipt}
+            startIcon={<Icon name="receipt" size={20} />}
+            data-tour="add-receipt"
+            sx={{ alignSelf: 'flex-start' }}
+          >
+            {t('receipt.add')}
+          </Button>
+        )}
       </Sheet>
     );
   }

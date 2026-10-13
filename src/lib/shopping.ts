@@ -3,6 +3,8 @@ import { formatQuantity, splitMoney } from './format';
 
 /** Market chosen to sort the shopping list, remembered in this browser. */
 export const MARKET_KEY = 'cella.market';
+/** Stored instead of a market id when the household shops without a market. */
+export const NO_MARKET = 'none';
 
 /** Rounds away float noise: 0.1 + 0.2 -> 0.3. */
 export function roundQuantity(value: number): number {

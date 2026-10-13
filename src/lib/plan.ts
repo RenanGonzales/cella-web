@@ -122,32 +122,50 @@ export function uniqueName(base: string, pieces: Piece[]): string {
 let localKeys = 0;
 export const newKey = (): string => `new-${(localKeys += 1)}`;
 
+export type Direction = 'left' | 'right' | 'up' | 'down';
+
+const STEP: Record<Direction, [number, number]> = {
+  left: [-1, 0],
+  right: [1, 0],
+  up: [0, -1],
+  down: [0, 1],
+};
+
+/** Moves every piece; used when the grid grows on the left or at the top. */
+function shiftAll(pieces: Piece[], dx: number, dy: number): Piece[] {
+  return pieces.map((piece) => ({ ...piece, x: piece.x + dx, y: piece.y + dy }));
+}
+
 /**
- * Copies of the selected pieces, right next to them (to the right, or below: two rows of
- * aisles with a cross aisle between make a wholesale store). The grid grows when there
- * is no room. Copies start without categories: a category lives in one corridor per market.
+ * Copies of the selected pieces right next to them, on any side. When that side has no
+ * room, the grid grows there (pieces stay where they are relative to each other).
+ * Copying a row of aisles down builds a wholesale store with a cross aisle; an entrance
+ * and checkout along the front edge stay at the front. Copies start without categories:
+ * a category lives in one corridor per market.
  */
 export function duplicate(
   plan: Plan,
   keys: string[],
-  direction: 'right' | 'below' = 'right',
+  direction: Direction = 'right',
 ): { pieces: Piece[]; cols: number; rows: number; copies: string[] } | null {
   const picked = plan.pieces.filter((piece) => keys.includes(piece.key));
   if (picked.length === 0) return null;
-  const right = direction === 'right';
-  const start = Math.min(...picked.map((piece) => (right ? piece.x : piece.y)));
-  const end = Math.max(...picked.map((piece) => (right ? piece.x + piece.w : piece.y + piece.h)));
+  const [sx, sy] = STEP[direction];
+  const horizontal = sx !== 0;
+  const start = Math.min(...picked.map((piece) => (horizontal ? piece.x : piece.y)));
+  const end = Math.max(
+    ...picked.map((piece) => (horizontal ? piece.x + piece.w : piece.y + piece.h)),
+  );
   let shift = end - start + 1;
-  // Entrance and checkout along the front (bottom) edge stay at the front: a block copied
-  // below goes between them and the original, and they move down.
-  const front = right
-    ? []
-    : plan.pieces.filter(
-        (piece) => !keys.includes(piece.key) && !isStop(piece) && piece.y + piece.h === plan.rows,
-      );
+
+  const front =
+    direction === 'down'
+      ? plan.pieces.filter(
+          (piece) => !keys.includes(piece.key) && !isStop(piece) && piece.y + piece.h === plan.rows,
+        )
+      : [];
   const others = plan.pieces.filter((piece) => !keys.includes(piece.key) && !front.includes(piece));
-  const moved = (piece: Piece) =>
-    right ? { ...piece, x: piece.x + shift } : { ...piece, y: piece.y + shift };
+  const moved = (piece: Piece) => ({ ...piece, x: piece.x + sx * shift, y: piece.y + sy * shift });
   while (picked.some((piece) => others.some((other) => overlaps(moved(piece), other)))) shift += 1;
 
   let pieces = [...plan.pieces];
@@ -170,10 +188,40 @@ export function duplicate(
     );
     pieces = pieces.map((piece) => (front.includes(piece) ? { ...piece, y: bottom + 1 } : piece));
   }
-  const cols = Math.max(plan.cols, ...pieces.map((piece) => piece.x + piece.w));
-  const rows = Math.max(plan.rows, ...pieces.map((piece) => piece.y + piece.h));
+  // Copies past the left or top edge: grow the grid on that side.
+  const growX = Math.max(0, -Math.min(...pieces.map((piece) => piece.x)));
+  const growY = Math.max(0, -Math.min(...pieces.map((piece) => piece.y)));
+  pieces = shiftAll(pieces, growX, growY);
+  const cols = Math.max(plan.cols + growX, ...pieces.map((piece) => piece.x + piece.w));
+  const rows = Math.max(plan.rows + growY, ...pieces.map((piece) => piece.y + piece.h));
   if (cols > LIMITS.maxCols || rows > LIMITS.maxRows) return null;
   return { pieces, cols, rows, copies };
+}
+
+export type Side = 'left' | 'right' | 'top' | 'bottom';
+
+/**
+ * One more (+1) or one less (-1) row or column on a side of the market. Adding on the
+ * left or top moves everything along; removing only works when that edge is empty.
+ */
+export function resizeSide(plan: Plan, side: Side, delta: 1 | -1): Plan | null {
+  const horizontal = side === 'left' || side === 'right';
+  const cols = plan.cols + (horizontal ? delta : 0);
+  const rows = plan.rows + (horizontal ? 0 : delta);
+  if (cols < LIMITS.minSize || rows < LIMITS.minSize) return null;
+  if (cols > LIMITS.maxCols || rows > LIMITS.maxRows) return null;
+  if (delta < 0) {
+    const touches: Record<Side, (piece: Piece) => boolean> = {
+      left: (piece) => piece.x === 0,
+      right: (piece) => piece.x + piece.w === plan.cols,
+      top: (piece) => piece.y === 0,
+      bottom: (piece) => piece.y + piece.h === plan.rows,
+    };
+    if (plan.pieces.some(touches[side])) return null;
+  }
+  const dx = side === 'left' ? delta : 0;
+  const dy = side === 'top' ? delta : 0;
+  return { ...plan, cols, rows, pieces: shiftAll(plan.pieces, dx, dy) };
 }
 
 // --- Route -------------------------------------------------------------------

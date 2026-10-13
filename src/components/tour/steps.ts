@@ -7,7 +7,7 @@ export interface TourStep {
   id: string;
   targets: string[];
   advance: 'next' | 'click' | 'event';
-  event?: 'consumed' | 'started' | 'split' | 'checkout';
+  event?: 'consumed' | 'started' | 'split' | 'checkout' | 'receipt';
 }
 
 const STEPS: TourStep[] = [
@@ -16,7 +16,12 @@ const STEPS: TourStep[] = [
   { id: 'use', targets: ['use-Whole milk'], advance: 'event', event: 'consumed' },
   { id: 'to-list', targets: ['nav-/list'], advance: 'click' },
   { id: 'corridors', targets: ['list-first-section'], advance: 'next' },
-  { id: 'start', targets: ['start-shopping'], advance: 'event', event: 'started' },
+  {
+    id: 'start',
+    targets: ['start-shopping', 'start-confirm'],
+    advance: 'event',
+    event: 'started',
+  },
   { id: 'check', targets: ['store-item'], advance: 'click' },
   {
     id: 'split',
@@ -33,6 +38,8 @@ const STEPS: TourStep[] = [
     advance: 'event',
     event: 'checkout',
   },
+  { id: 'receipt', targets: ['add-receipt'], advance: 'click' },
+  { id: 'receipt-review', targets: ['receipt-save'], advance: 'event', event: 'receipt' },
   { id: 'end', targets: [], advance: 'next' },
 ];
 
