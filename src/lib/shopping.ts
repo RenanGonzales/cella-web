@@ -1,6 +1,9 @@
 import type { Product, ProductUnit, ShoppingList, ShoppingListItem } from '../api/types';
 import { formatQuantity, splitMoney } from './format';
 
+/** Market chosen to sort the shopping list, remembered in this browser. */
+export const MARKET_KEY = 'cella.market';
+
 /** Rounds away float noise: 0.1 + 0.2 -> 0.3. */
 export function roundQuantity(value: number): number {
   return Math.round(value * 1000) / 1000;

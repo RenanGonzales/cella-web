@@ -3,6 +3,38 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/) (0.x while in MVP).
 
+## [0.5.0] - 2026-10-12
+
+Needs cella-api 0.8.0 (floor plans).
+
+### Added
+
+- Floor plan editor (`/markets/:id`, large screens): a dotted grid where the market is rebuilt with aisles, walls, square and rectangular islands, an entrance and a checkout.
+  - Drag to move, drag the corner to resize; keyboard too (arrows move, Shift + arrows resize, Delete, Ctrl/Cmd + D duplicates, Esc clears). Pieces never leave the grid or land on each other.
+  - Shift + click selects several; "Duplicate right" and "Duplicate below" copy them next to the selection, growing the market when needed. Copying a row of aisles below builds a wholesale store with a cross aisle, and keeps the entrance and checkout at the front.
+  - Market size (width and depth) adjustable, never cutting a piece.
+  - Inspector: name (unique), type, categories; categories without a place can be dropped into the selected corridor with one tap.
+- Walking route: an automatic zigzag from the entrance's corner (up one corridor, down the next), drawn as a numbered dotted line. Stores with two blocks of aisles choose between "Through the cross aisle" (default) and "Block by block". Route mode lets the order be picked by hand, with "Reset to zigzag".
+- Markets without a plan get a first draft from their corridors ("Create floor plan"); the plan's order sorts the shopping list once saved.
+- On phones, the market shows the route on a small plan and the walking order (editing stays on larger screens).
+- Asks before leaving with unsaved changes.
+- Tests: 62 in total (route engine, collisions, duplication, saving, keyboard editing, manual order).
+
+## [0.4.0] - 2026-10-12
+
+### Added
+
+- Products screen: search by name, brand or category (accents ignored), filter by area, archived view; each row shows the stock against the ideal and whether it is on the list.
+- Product form: name, brand, category (pick one or create it on the spot), area, unit, stock now, what one "Use" takes, minimum and ideal. Checked with the API's rules before sending (minimum not above the ideal, step above zero, up to 3 decimals, "0,5" accepted); edits send only what changed. Archive and restore.
+- Markets screen: cards with chain, address and number of corridors, create, edit, archive and restore, and "Use for my list" to choose the market that sorts the shopping list.
+- The sidebar search opens the products screen already filtered; the market name on the shopping list links to the markets screen.
+- Tests: 41 in total.
+
+### Fixed
+
+- Adding a market no longer changes, by itself, the market that sorts the list.
+- Favicon path under `/cella/`.
+
 ## [0.3.0] - 2026-10-12
 
 Needs cella-api 0.7.0 (one private demo household per visitor).
@@ -47,6 +79,8 @@ Needs cella-api 0.7.0 (one private demo household per visitor).
 - English and Brazilian Portuguese translations.
 - Tests (Vitest + Testing Library), ESLint, Prettier and GitHub Actions CI.
 
+[0.5.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.5.0
+[0.4.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.4.0
 [0.3.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.3.0
 [0.2.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.2.0
 [0.1.0]: https://github.com/RenanGonzales/cella-web/releases/tag/v0.1.0

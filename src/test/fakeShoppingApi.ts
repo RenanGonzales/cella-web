@@ -12,6 +12,7 @@ export const MARKET: Market = {
   chain: null,
   address: null,
   corridor_count: 2,
+  has_plan: false,
   archived_at: null,
 };
 

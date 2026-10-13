@@ -10,7 +10,9 @@ export function Sheet({
   title,
   children,
   actions,
+  wide = false,
 }: {
+  wide?: boolean;
   open: boolean;
   onClose: () => void;
   title: string;
@@ -22,7 +24,7 @@ export function Sheet({
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth="xs"
+      maxWidth={wide ? 'sm' : 'xs'}
       aria-labelledby="sheet-title"
       sx={{ '& .MuiDialog-container': { alignItems: { xs: 'flex-end', sm: 'center' } } }}
       slotProps={{

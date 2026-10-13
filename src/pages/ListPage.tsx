@@ -36,14 +36,12 @@ import { Sheet } from '../components/list/Sheet';
 import { SplitDialog } from '../components/list/SplitDialog';
 import { BigNumber, Card, Icon, Money, SegmentBar } from '../components/ui';
 import { splitMoney } from '../lib/format';
-import { cartStats, isSplit, listItems, listSections, stepOf } from '../lib/shopping';
+import { MARKET_KEY, cartStats, isSplit, listItems, listSections, stepOf } from '../lib/shopping';
 import type { CartStats, ListSection } from '../lib/shopping';
 import { listStats } from '../lib/stats';
 import { useStoredString } from '../lib/storage';
 import { emitTourEvent } from '../lib/tour';
 import { palette } from '../theme';
-
-const MARKET_KEY = 'cella.market';
 
 /** Segment bars switch to a plain bar above this many items. */
 const MAX_SEGMENTS = 30;
@@ -261,7 +259,11 @@ function PlanView({
             </Box>
           ) : (
             sortMarket && (
-              <Box component="span" sx={{ color: palette.navy, fontWeight: 500 }}>
+              <Box
+                component={RouterLink}
+                to="/markets"
+                sx={{ color: palette.navy, fontWeight: 500, textUnderlineOffset: 3 }}
+              >
                 {sortMarket.name}
               </Box>
             )

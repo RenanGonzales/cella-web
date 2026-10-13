@@ -1,13 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { Layout, Plan } from '../lib/plan';
+import { layoutBody } from '../lib/plan';
 import { api } from './client';
 import type {
+  Category,
   CheckoutResponse,
   ConsumeResponse,
   ItemChanges,
   Market,
+  MarketInput,
   Me,
   Product,
+  ProductInput,
   ShoppingList,
   ShoppingListItem,
   StorageArea,
@@ -22,6 +27,10 @@ export const keys = {
   list: ['shopping-list'] as const,
   listView: (marketId: string | null) => ['shopping-list', marketId ?? 'default'] as const,
   markets: ['markets'] as const,
+  archivedMarkets: ['markets', 'archived'] as const,
+  categories: ['categories'] as const,
+  layout: (marketId: string) => ['markets', marketId, 'layout'] as const,
+  archivedProducts: ['products', 'archived'] as const,
 };
 
 /** The shared list changes when someone else consumes: refresh it every few seconds. */
@@ -210,5 +219,133 @@ export function useCheckout() {
         client.invalidateQueries({ queryKey: keys.list }),
         client.invalidateQueries({ queryKey: keys.products }),
       ]),
+  });
+}
+
+// --- Catalog ---------------------------------------------------------------
+
+export function useCategories() {
+  return useQuery({ queryKey: keys.categories, queryFn: () => api<Category[]>('/categories') });
+}
+
+export function useCreateCategory() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => api<Category>('/categories', { method: 'POST', body: { name } }),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.categories }),
+  });
+}
+
+/** Archived products only (the API returns them mixed with the active ones). */
+export function useArchivedProducts(enabled: boolean) {
+  return useQuery({
+    queryKey: keys.archivedProducts,
+    queryFn: async () =>
+      (await api<Product[]>('/products?include_archived=true')).filter(
+        (product) => product.archived_at !== null,
+      ),
+    enabled,
+  });
+}
+
+/** Any change to a product can move it on or off the shopping list. */
+function useProductAction<T>(request: (input: T) => Promise<Product>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: request,
+    onSuccess: () =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: keys.products }),
+        client.invalidateQueries({ queryKey: keys.list }),
+      ]),
+  });
+}
+
+export function useCreateProduct() {
+  return useProductAction((body: ProductInput) =>
+    api<Product>('/products', { method: 'POST', body }),
+  );
+}
+
+export function useUpdateProduct() {
+  return useProductAction(({ id, changes }: { id: string; changes: Partial<ProductInput> }) =>
+    api<Product>(`/products/${id}`, { method: 'PATCH', body: changes }),
+  );
+}
+
+export function useArchiveProduct() {
+  return useProductAction((id: string) =>
+    api<Product>(`/products/${id}/archive`, { method: 'POST' }),
+  );
+}
+
+export function useRestoreProduct() {
+  return useProductAction((id: string) =>
+    api<Product>(`/products/${id}/restore`, { method: 'POST' }),
+  );
+}
+
+// --- Markets ---------------------------------------------------------------
+
+export function useArchivedMarkets(enabled: boolean) {
+  return useQuery({
+    queryKey: keys.archivedMarkets,
+    queryFn: async () =>
+      (await api<Market[]>('/markets?include_archived=true')).filter(
+        (market) => market.archived_at !== null,
+      ),
+    enabled,
+  });
+}
+
+function useMarketAction<T>(request: (input: T) => Promise<Market>) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: request,
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.markets }),
+  });
+}
+
+export function useCreateMarket() {
+  return useMarketAction((body: MarketInput) => api<Market>('/markets', { method: 'POST', body }));
+}
+
+export function useUpdateMarket() {
+  return useMarketAction(({ id, changes }: { id: string; changes: MarketInput }) =>
+    api<Market>(`/markets/${id}`, { method: 'PATCH', body: changes }),
+  );
+}
+
+export function useArchiveMarket() {
+  return useMarketAction((id: string) => api<Market>(`/markets/${id}/archive`, { method: 'POST' }));
+}
+
+export function useRestoreMarket() {
+  return useMarketAction((id: string) => api<Market>(`/markets/${id}/restore`, { method: 'POST' }));
+}
+
+// --- Floor plan ------------------------------------------------------------
+
+export function useLayout(marketId: string | undefined) {
+  return useQuery({
+    queryKey: keys.layout(marketId ?? ''),
+    queryFn: () => api<Layout>(`/markets/${marketId}/layout`),
+    enabled: Boolean(marketId),
+  });
+}
+
+/** Save the whole plan; the shopping list is sorted by it, so it reloads too. */
+export function useSaveLayout(marketId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (plan: Plan) =>
+      api<Layout>(`/markets/${marketId}/layout`, { method: 'PUT', body: layoutBody(plan) }),
+    onSuccess: (layout) => {
+      client.setQueryData(keys.layout(marketId), layout);
+      return Promise.all([
+        client.invalidateQueries({ queryKey: keys.markets, exact: true }),
+        client.invalidateQueries({ queryKey: keys.list }),
+      ]);
+    },
   });
 }

@@ -9,6 +9,9 @@ import { DemoPage } from './pages/DemoPage';
 import { HomePage } from './pages/HomePage';
 import { ListPage } from './pages/ListPage';
 import { LoginPage } from './pages/LoginPage';
+import { MarketPlanPage } from './pages/MarketPlanPage';
+import { MarketsPage } from './pages/MarketsPage';
+import { ProductsPage } from './pages/ProductsPage';
 import { SoonPage } from './pages/SoonPage';
 import { WelcomePage } from './pages/WelcomePage';
 
@@ -62,8 +65,9 @@ export function AppRoutes() {
         <Route index element={<HomePage />} />
         <Route path="areas/:areaId" element={<AreaPage />} />
         <Route path="list" element={<ListPage />} />
-        <Route path="products" element={<SoonPage titleKey="nav.products" />} />
-        <Route path="markets" element={<SoonPage titleKey="nav.markets" />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="markets" element={<MarketsPage />} />
+        <Route path="markets/:marketId" element={<MarketPlanPage />} />
         <Route path="history" element={<SoonPage titleKey="nav.history" />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

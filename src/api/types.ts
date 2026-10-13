@@ -49,6 +49,30 @@ export interface Product {
   archived_at: string | null;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+}
+
+/** Fields of POST /products (all) and PATCH /products/{id} (any). */
+export interface ProductInput {
+  name: string;
+  brand: string | null;
+  category_id: string;
+  storage_area_id: string;
+  unit: ProductUnit;
+  consume_step: number;
+  ideal_quantity: number;
+  min_quantity: number;
+  current_quantity: number;
+}
+
+export interface MarketInput {
+  name: string;
+  chain: string | null;
+  address: string | null;
+}
+
 export interface ConsumeResponse {
   product: Product;
   consumption_event_id: string | null;
@@ -108,6 +132,7 @@ export interface Market {
   chain: string | null;
   address: string | null;
   corridor_count: number;
+  has_plan: boolean;
   archived_at: string | null;
 }
 

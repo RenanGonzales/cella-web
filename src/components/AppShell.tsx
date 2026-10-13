@@ -1,7 +1,7 @@
 import { Box, ButtonBase, IconButton, InputBase, Tooltip, useMediaQuery } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 import { useMe, useProducts } from '../api/hooks';
 import { useAuth } from '../auth/AuthContext';
@@ -74,9 +74,16 @@ function Sidebar() {
   const { t } = useTranslation();
   const { logout } = useAuth();
   const tour = useRestartTour();
+  const navigate = useNavigate();
   const { data: me } = useMe();
   const { data: products = [] } = useProducts();
   const [collapsed, setCollapsed] = useState(readCollapsed);
+  const [search, setSearch] = useState('');
+  // The sidebar search opens the products screen, filtered.
+  const searchProducts = () => {
+    navigate(search.trim() ? `/products?q=${encodeURIComponent(search.trim())}` : '/products');
+    setSearch('');
+  };
 
   const toggle = () => {
     setCollapsed((value) => {
@@ -165,6 +172,7 @@ function Sidebar() {
       {collapsed ? (
         <IconButton
           aria-label={t('nav.search')}
+          onClick={() => navigate('/products')}
           sx={{
             alignSelf: 'center',
             bgcolor: palette.canvas,
@@ -190,8 +198,11 @@ function Sidebar() {
         >
           <Icon name="search" size={18} />
           <InputBase
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && searchProducts()}
             placeholder={t('nav.search')}
-            inputProps={{ 'aria-label': t('nav.search') }}
+            inputProps={{ 'aria-label': t('nav.search'), type: 'search' }}
             sx={{ flex: 1, fontSize: 14 }}
           />
         </Box>
